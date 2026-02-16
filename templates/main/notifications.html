@@ -1,0 +1,53 @@
+<!-- Notifications Modal -->
+<div id="notificationsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Notifications</h4>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <!-- Device notifications cards -->
+                <div id="deviceNotificationsCards">
+                    <!-- Each div represents a device notification -->
+                    <!-- This will be populated dynamically using JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="refreshNotificationsHandler()"
+                        id="refreshNotificationsBtn"
+                    >
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Close
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="clearAllNotificationsBtn"
+                        onclick="clearAllNotificationsHandler()"
+                    >
+                        Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

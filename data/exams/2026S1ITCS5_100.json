@@ -1,0 +1,571 @@
+{
+    "Metadata": {
+        "Version": 1,
+        "ExamID": "2026S1ITCS5.100",
+        "ExamTime": 90,
+        "Program": "BCS",
+        "Level": 5,
+        "Weight": 30,
+        "CourseCode": "ITCS5.100",
+        "Course": "Computer System Architecture",
+        "OutofMark": 80,
+        "StudentID": "",
+        "Password": "",
+        "Mark": 0,
+        "TimeStart": 0,
+        "TimeEnd": 0
+    },
+    "Exam": {
+        "Sections": [
+            {
+                "Title": "SECTION A: Hardware",
+                "Qtype": "OWA",
+                "Instruction": "Answer all questions within this section in the space provided. One mark will be given for each correct answer. ",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "A ~~~~~, is the *component* within every **computing** device that carries out the instructions of a program by performing the basic arithmetic, logical, and input/output activities.",
+                        "Solution": "Central Processing Unit (CPU)",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "A storage drive in a modern computer referred to as ~~~~~ drive",
+                        "Solution": "NVMe",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "The arithmetic logic unit performs in the central processing unit performs all of the ~~~~~ operations.",
+                        "Solution": "Integer math",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "The CPU ~~~~~ is a complex electronic component that provides most of the processing functionality in a desktop computer",
+                        "Solution": "Core",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "A CPU includes several types of fast ~~~~~ memory to improve computing performance",
+                        "Solution": "Cache ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "~~~~~ are temporary storage used by instructions and data. E.g. Accumulator, Stack pointer, Instruction pointer, program counter, etc.",
+                        "Solution": "Registers ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "The system memory (~~~~~ Memory) is the main working memory in a typical computer",
+                        "Solution": "Random Access ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "Modern desktop and notebook computers no longer include ~~~~~ as part of their build",
+                        "Solution": "Optical drives ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "A ~~~~~ is a specialised computer or software system designed to provide services, data, or resources to other computers, known as clients, over a network",
+                        "Solution": "Server ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    },
+                    {
+                        "Question": "A computer with 1000's processors and Terabytes of storage used to train Artificial Intelligence models is often know as a ~~~~~",
+                        "Solution": "Supercomputer ",
+                        "Mark": 0,
+                        "Outof": 1,
+                        "Answer": ""
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION B: HEALTH AND SAFETY",
+                "Qtype": "DI",
+                "Instruction": "",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "Explain why the chair is considered an important piece of equipment when operating a computer. Describe the characteristics of a suitable chair for the computer environment",
+                        "Solution": "Includes Ergonomics, 5 casters, adjustable lumba & height, cushions",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 5
+                    },
+                    {
+                        "Question": "Describe why warm white lighting is better to use than cool white when working with computers at night.",
+                        "Solution": "Includes - Blue light harmful to eye cones, stimulates the brain, causes eye strain",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "What are the risks associated with ISO propyl alcohol?",
+                        "Solution": "Includes - dissolves essential body oils, skin irritant, harmful to the CNS, highly flammable",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 3
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION C: DOCUMENTATION",
+                "Qtype": "SA",
+                "Instruction": [
+                    "Given the following markdown, answer the questions below:",
+                    "# Heading",
+                    "## Sub-heading",
+                    "Paragraphs are separated by a blank line.",
+                    "",
+                    "Two spaces at the end of a line",
+                    "produces a line break.",
+                    "",
+                    "Text attributes _italic, `monospace`.",
+                    "",
+                    "- Item 1",
+                    "- Item 2",
+                    "",
+                    "1. Item 1",
+                    "1. Item 2",
+                    "",
+                    "Horizontal rule:",
+                    "---"
+                ],
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "Describe an intent or a common use of the markdown language?",
+                        "Solution": "Includes - lowest common representation of text, portability across platforms",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "What command string would render bold AND italicised text not shown below?",
+                        "Solution": "**…** and *….*",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "What is the purpose of the “\\” character in markdown?",
+                        "Solution": "Include - to escape characters not interpreted as markdown",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "Clearly describe the respective rendered output of TWO “commands” illustrated in the markdown script below. Mention 8 tools for auto-generating code documentation",
+                        "Solution": "",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION D: PROBLEM SOLVING AND SOFTWARE",
+                "Qtype": "OWA",
+                "Instruction": "Answer all questions within in the space provided. One mark will be given for each correct answer. ",
+                "OutofMark": 10,
+                "Questions": [
+                    {
+                        "Question": "~~~~~ is a logical, systematic search for the source of a problem so that it can be solved",
+                        "Solution": "Problem solving",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Two examples of high-level programming languages are ~~~~~ and ~~~~~",
+                        "Solution": [
+                            "Python",
+                            "JavaScript"
+                        ],
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "Linux is considered ~~~~~ operating systems whereas ~~~~~ and ~~~~~ are proprietary ",
+                        "Solution": [
+                            "Open-source",
+                            "Windows",
+                            "MacOS"
+                        ],
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 3
+                    },
+                    {
+                        "Question": "Two examples of Application Software are ~~~~~ and ~~~~~",
+                        "Solution": [
+                            "Excel",
+                            "PowerPoint"
+                        ],
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "~~~~~ consists of using various methods, in an orderly manner, to find solutions to problems.",
+                        "Solution": "Troubleshooting",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "~~~~~ is probably the most problematic computer component when it comes to troubleshooting.",
+                        "Solution": "RAM",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION E: DIAGNOSTIC TOOLS",
+                "Qtype": "SA",
+                "Instruction": "Answer all questions within in the space provided.",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "In file maintenance, briefly explain what 'defragmentation' is, and why you would NOT defragment the SSD.",
+                        "Solution": "Include - data placed at random locations. Impacts read latency. designed for spindle drives, SSD does not get fragmented, it is optimized.",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 3
+                    },
+                    {
+                        "Question": "When configuring a workstation for a specific role, explain how “burn-in test” could ensure a successful build.",
+                        "Solution": "Include - check for stability and ensure no hardware has failed. Checks cooling over time and that the hardware performs as intended under load.",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "Describe TWO informational or control aspects of Windows Task Manager which could be useful if you were trying to diagnose degraded performance of a Microsoft Windows workstation?",
+                        "Solution": "Include any - process count, memory usage, cpu usage, io consumption",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "Describe what is meant by benchmarking and the importance if this in regards to computer hardware",
+                        "Solution": "Include - check for stability and performing at the designed spec of the hardware.",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 3
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION F: SECURITY CONCEPTS",
+                "Qtype": "OWA",
+                "Instruction": ": Answer all questions within the space provided. One mark will be given for each correct answer.",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "The accepted definition of information security within a government is: ~~~~~ relating to the ~~~~~, availability and ~~~~~ of information'”.",
+                        "Solution": [
+                            "Measures",
+                            "Confidentiality",
+                            "Integrity"
+                        ],
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "~~~~~: Verifying the identity of a user, device, or entity in a computer system. Common methods include passwords, biometrics, and multi-factor authentication.",
+                        "Solution": "Authentication",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "~~~~~: Transforming information into a secure format that can only be read by someone with the correct decryption key. This is crucial for protecting data in transit and at rest.",
+                        "Solution": "Encryption",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "~~~~~: Techniques and software used to prevent, detect, and remove malicious software, such as viruses, worms, and ransomware.",
+                        "Solution": "Endpoint Protection",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Four primary security attach categories are Access, Modification, ~~~~~ and ~~~~~.",
+                        "Solution": [
+                            "Denial of Service",
+                            "Repudiation"
+                        ],
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Security countermeasures include ~~~~~ and encryption",
+                        "Solution": "Multi-factor authentication",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "~~~~~: The process of identifying, assessing, and mitigating risks to an organization's assets. This includes conducting risk assessments, implementing controls, and monitoring for new threats.",
+                        "Solution": "Risk Management",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION G: OPERATING SYSTEMS",
+                "Qtype": "SA",
+                "Instruction": "",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "Briefly describe the role of an operating system in the context of computing devices.",
+                        "Solution": "Include - manages/allocates computer hardware and software resources, and provides common services/API for computer programs",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 3
+                    },
+                    {
+                        "Question": "In terms of the bootstrapping process, correctly expand the POST acronym.",
+                        "Solution": "Power On Self Test",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Describe two benefits of PowerShell for the operating system.",
+                        "Solution": "Include - automation and repetitive tasks",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 2
+                    },
+                    {
+                        "Question": "Briefly describe a primary benefit of using a 64-bit operating system over a 32-bit operating system.",
+                        "Solution": "Include any larger applications, access to more memory, faster code",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 4
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION H: NETWORKING",
+                "Qtype": "MAW",
+                "Instruction": "Answer all questions within the space provided. One mark will be given for each correct answer",
+                "OutofMark": 10,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "Network generally considered within the organisation and on a single geographic site.",
+                        "Solution": " Local Area Network (LAN)",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Definitions of common sets of rules and signals that specify how computers on a network communicate.",
+                        "Solution": "standards/protocols",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Architecture of a network.",
+                        "Solution": "peer-to-peer or client-server",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "TCP/IP software.",
+                        "Solution": "OSI Internetwork Layer",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Network element used to identify a target network and a specific device within the target network.",
+                        "Solution": "IP address",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Data Link layer and Physical Layer.",
+                        "Solution": " Local Area Network (LAN)",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Device used to connect one network to another.",
+                        "Solution": "Router",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "A TCP/IP network mechanism used to determine if a device on a network is active.",
+                        "Solution": "Ping",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "A secure TCP/IP protocol used with browsers to request resources of an encrypted session.",
+                        "Solution": "HTTPS",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "A measurement indicating the maximum capacity of a network communications connection in a given amount of time.",
+                        "Solution": "Bandwidth",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION I: MC",
+                "Qtype": "MC",
+                "Instruction": "",
+                "OutofMark": 4,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": [
+                            "When working in the Linux terminal, which of the following commands is used to find the appropriate help from the various manual pages?",
+                            " ",
+                            "1. {Command{ --help",
+                            "1. man {Command}",
+                            "1. apropos {Command}",
+                            "1. whatis {Command}",
+                            "1. All of the above"
+                        ],
+                        "Solution": "A",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": [
+                            "The user login information is stored in which file?",
+                            " ",                            
+                            "1. /usr/passwd",
+                            "1. /home/passwd",
+                            "1. /etc/passwd",
+                            "1. /etc/usr/passwd",
+                            "1. /var/passwd"
+                        ],
+                        "Solution": "B",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": [
+                            "You have edited the network configuration file to create a static IP address. However, changes haven’t taken effect and you cannot reach the internet. Your problem could be:",
+                            " ",
+                            "1. A network switch or router is down",
+                            "1. You need to restart the networking service",
+                            "1. The network adapter is turned off",
+                            "1. A wireless service is down",
+                            "1. All of the above"
+                        ],
+                        "Solution": "C",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": [
+                            "Which of the following is not a function of the Linux kernel?",
+                            " ",
+                            "1. Process management",
+                            "1. Resource management",
+                            "1. User management",
+                            "1. Memory management",
+                            "1. All of the above"
+                        ],
+                        "Solution": "C",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    }
+                ]
+            },
+            {
+                "Title": "SECTION J: TF",
+                "Qtype": "TF",
+                "Instruction": "",
+                "OutofMark": 4,
+                "Extra": [],
+                "Questions": [
+                    {
+                        "Question": "When working in the Linux terminal, which of the following commands is used to find the appropriate help from the various manual pages?",
+                        "Solution": "T",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "The user login information is stored in which file?",
+                        "Solution": "T",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "You have edited the network configuration file to create a static IP address. However, changes haven’t taken effect and you cannot reach the internet. Your problem could be:",
+                        "Solution": "F",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    },
+                    {
+                        "Question": "Which of the following is not a function of the Linux kernel?",
+                        "Solution": "F",
+                        "Answer": "",
+                        "Mark": 0,
+                        "Outof": 1
+                    }
+                ]
+            }
+        ]
+    }
+}

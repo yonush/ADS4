@@ -1,0 +1,27 @@
+﻿CourseCode,Description,Level,Status
+ITCS5.100,Computer System Architecture,5,active
+ITPF5.110,Programming Fundamentals,5,active
+ITCT5.120,Concepts & Tools,5,active
+ITWD5.130,Website Development,5,active
+ITUX5.210,UX and UI fundamental,5,active
+ITDT5.228,Intro to Data Concepts,5,active
+ITPM5.240,Agile Projects,5,active
+ITIS5.450,Information Systems,5,active
+ITAE6.100,Automation and Embedded Systems,6,active
+ITDB6.208,Database Management Systems,6,active
+ITDC6.218,Data Communications & Networking,6,active
+ITHW6.238,Electronics and Internet of Things Technology,6,active
+ITMA6.240,Maths in IT,6,active
+ITPM6.318,Project Management,6,active
+ITSD6.348,Systems Analysis,6,active
+ITSD6.349,Systems Design,6,active
+ITPR6.358,User Experience & User Interfaces,6,active
+ITKM6.398,Knowledge Management,6,active
+ITWD6.408,Adv. Internet and Web Page Development,6,active
+ITCP7.00x,Capstone part 1 & 2,7,active
+ITAI7.110,Machine Learning and Artificial Intelligence,7,active
+ITFM7.120,Mechatronics in IT,7,active
+ITDA7.240,Data Analytics,7,active
+ITWD7.358,Web Application Programming,7,active
+ITEC7.398,E-Business Strategies,7,active
+ITSY7.668,Cybersecurity,7,active

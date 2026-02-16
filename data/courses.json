@@ -1,0 +1,127 @@
+[
+  {
+    "ExamID": "2025S1ITCS5.100",
+    "Code": "ITCS5.100",
+    "Description": "Computer System Architecture"
+  },
+  {
+    "ExamID": "2025S1ITPF5.110",
+    "Code": "ITPF5.110",
+    "Description": "Programming Fundamentals"
+  },
+  {
+    "ExamID": "2025S1ITCT5.120",
+    "Code": "ITCT5.120",
+    "Description": "Concepts & Tools"
+  },
+  {
+    "ExamID": "2025S1ITWD5.130",
+    "Code": "ITWD5.130",
+    "Description": "Website Development"
+  },
+  {
+    "ExamID": "2025S1ITUX5.210",
+    "Code": "ITUX5.210",
+    "Description": "UX and UI fundamental"
+  },
+  {
+    "ExamID": "2025S1ITDT5.228",
+    "Code": "ITDT5.228",
+    "Description": "Intro to Data Concepts"
+  },
+  {
+    "ExamID": "2025S1ITPM5.240",
+    "Code": "ITPM5.240",
+    "Description": "Agile Projects"
+  },
+  {
+    "ExamID": "2025S1ITIS5.450",
+    "Code": "ITIS5.450",
+    "Description": "Information Systems"
+  },
+  {
+    "ExamID": "2025S1ITAE6.100",
+    "Code": "ITAE6.100",
+    "Description": "Automation and Embedded Systems"
+  },
+  {
+    "ExamID": "2025S1ITDB6.208",
+    "Code": "ITDB6.208",
+    "Description": "Database Management Systems"
+  },
+  {
+    "ExamID": "2025S1ITDC6.218",
+    "Code": "ITDC6.218",
+    "Description": "Data Communications & Networking"
+  },
+  {
+    "ExamID": "2025S1ITHW6.238",
+    "Code": "ITHW6.238",
+    "Description": "Electronics and Internet of Things Technology"
+  },
+  {
+    "ExamID": "2025S1ITMA6.240",
+    "Code": "ITMA6.240",
+    "Description": "Maths in IT"
+  },
+  {
+    "ExamID": "2025S1ITPM6.318",
+    "Code": "ITPM6.318",
+    "Description": "Project Management"
+  },
+  {
+    "ExamID": "2025S1ITSD6.348",
+    "Code": "ITSD6.348",
+    "Description": "Systems Analysis"
+  },
+  {
+    "ExamID": "2025S1ITSD6.349",
+    "Code": "ITSD6.349",
+    "Description": "Systems Design"
+  },
+  {
+    "ExamID": "2025S1ITPR6.358",
+    "Code": "ITPR6.358",
+    "Description": "User Experience & User Interfaces"
+  },
+  {
+    "ExamID": "2025S1ITKM6.398",
+    "Code": "ITKM6.398",
+    "Description": "Knowledge Management"
+  },
+  {
+    "ExamID": "2025S1ITWD6.408",
+    "Code": "ITWD6.408",
+    "Description": "Adv. Internet and Web Page Development"
+  },
+  {
+    "ExamID": "2025S1ITAI7.110",
+    "Code": "ITAI7.110",
+    "Description": "Machine Learning and Artificial Intelligence"
+  },
+  {
+    "ExamID": "2025S1ITFM7.120",
+    "Code": "ITFM7.120",
+    "Description": "Mechatronics in IT"
+  },
+  {
+    "ExamID": "2025S1ITDA7.240",
+    "Code": "ITDA7.240",
+    "Description": "Data Analytics"
+  },
+  {
+    "ExamID": "2025S1ITWD7.358",
+    "Code": "ITWD7.358",
+    "Description": "Web Application Programming"
+  },
+  {
+    "ExamID": "2025S1ITEC7.398",
+    "Code": "ITEC7.398",
+    "Description": "E-Business Strategies"
+  },
+  {
+    "ExamID": "2025S1ITSY7.668",
+    "Code": "ITSY7.668",
+    "Description": "Cybersecurity"
+  }
+]

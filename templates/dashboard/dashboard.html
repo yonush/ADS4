@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-dark" data-bs-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ADS4 Dashboard</title>
+        <!-- favicon-->
+        <link
+            rel="icon"
+            type="image/png"
+            href="/static/assets/app_icon.png"
+            sizes="16x16"
+        />
+        
+        <!-- jQuery -->
+        <script src="/static/common/jquery.min.js"></script>
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="/static/common/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <!-- Bootstrap JS -->
+        <script
+            src="/static/common/bootstrap.bundle.min.js"
+        ></script>
+        <!-- Toastify JS -->
+        <script
+            src="/static/common/toastify.js"
+        ></script>
+        <!-- Toastify CSS-->
+        <link
+            rel="stylesheet"
+            href="/static/common/toastify.css"
+        />
+            <!-- Font Awesome -->
+        <!-- Font Awesome -->
+        <link
+            href="/static/common/all.min.css"
+            rel="stylesheet"
+        />
+                  
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/main/main.css" />
+        <script type="text/javascript">
+            $(document).ready(function () {
+                // Function to get query parameters by name
+                function getQueryParameter(param) {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(param);
+                }
+
+                // Get the message and error parameters from the query string
+                var message = getQueryParameter("message") || "{{.message}}";
+                var error = getQueryParameter("error") || "{{.error}}";
+
+                // If there's a message, display it using Toastify
+                if (message) {
+                    Toastify({
+                        text: message,
+                        duration: 6000,
+                        close: true,
+                        gravity: "top", // `top` or `bottom`
+                        position: "center", // `left`, `center` or `right`
+                        backgroundColor:
+                            "linear-gradient(to right, #008000, #008000)",
+                    }).showToast();
+                    // remove the message from the URL
+                    window.history.replaceState(
+                        {},
+                        document.title,
+                        "/dashboard"
+                    );
+                }
+
+                // If there's an error, display it using Toastify
+                if (error) {
+                    Toastify({
+                        text: error,
+                        duration: 6000,
+                        close: true,
+                        gravity: "top", // `top` or `bottom`
+                        position: "center", // `left`, `center` or `right`
+                        backgroundColor:
+                            "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    }).showToast();
+                    // remove the message from the URL
+                    window.history.replaceState(
+                        {},
+                        document.title,
+                        "/dashboard"
+                    );
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <!-- Dashboard Navbar -->
+        {{ template "dashboard_navbar.html" . }}
+
+        <!-- Map and Device List table -->
+        {{ template "offering_list.html" . }}
+
+        <!-- Notifications modal -->
+        {{ template "notifications.html" . }}
+
+        <!-- View Notes Modal-->
+        {{ template "notes_modal.html" . }}
+
+        <!-- Add Device Modal -->
+        {{ template "add_offering.html" . }}
+
+        <!-- Edit Device Modal -->
+        {{ template "edit_offering.html" . }}
+
+        <!-- Delete device modal -->
+        {{ template "delete_modal.html" . }}
+
+
+        <!-- Footer -->
+        {{ template "footer.html" . }}
+
+
+
+        <!-- Custom JS-->
+        <script>
+            var role = "{{.role}}";
+
+            var user_id = "{{.user_id}}";
+        </script>
+        <script type="module" src="/static/main/notifications.js"></script>
+        <script type="module" src="/static/main/main.js"></script>
+        <script
+            type="module"
+            defer
+            src="/static/dashboard/dashboard.js"
+        ></script>
+    </body>
+</html>

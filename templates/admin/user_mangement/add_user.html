@@ -1,0 +1,116 @@
+<div id="addUserModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add User</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <form
+                    class="form-control needs-validation"
+                    method="POST"
+                    action=""
+                    autocomplete="off"
+                    novalidate
+                    id="addUserForm"
+                >
+                    <div class="mb-3">
+                        <label for="username" class="form-label"
+                            >Username:</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="addUsername"
+                            name="username"
+                            pattern="^[a-zA-Z0-9_]{6,}$"
+                            required
+                        />
+                        <div class="invalid-feedback">
+                            Username must be at least 6 characters long and
+                            contain only letters, numbers, and underscores.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="addUserEmail"
+                            name="email"
+                            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                            required
+                        />
+                        <div class="invalid-feedback">
+                            Please enter a valid email.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addUserRole" class="form-label"
+                            >Role:</label
+                        >
+                        <select
+                            class="form-select"
+                            id="addUserRole"
+                            name="role"
+                            required
+                        >
+                            <option value="Admin">Admin</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Learner">Learner</option>
+
+
+                        </select>
+                    </div>
+                    <div class="mb-3" id="passwordField">
+                        <label for="password" class="form-label"
+                            >New Password:</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control mb-3"
+                            id="addUserPassword"
+                            name="password"
+                            pattern="(?=.*\d)(?=.*[!@#$%^&*])(?=.*[A-Z]).{8,}"
+                        />
+                        <div class="invalid-feedback">
+                            Password must contain at least 8 characters, one
+                            uppercase letter, one number and one special
+                            character.
+                        </div>
+                        <label for="password" class="form-label"
+                            >Confirm Password:</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="addUserConfirmPassword"
+                            name="confirm_password"
+                            pattern="(?=.*\d)(?=.*[!@#$%^&*]).{8,}"
+                        />
+                        <div class="invalid-feedback">
+                            Passwords do not match.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button type="button" id="addUserBtn" class="btn btn-primary">
+                    Add User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
