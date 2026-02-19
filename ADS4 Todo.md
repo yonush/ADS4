@@ -10,14 +10,22 @@
 - https://www.sqlite.org/pragma.html#pragma_synchronous
 - https://github.com/mattn/go-sqlite3?tab=readme-ov-file
 - https://go-sponge.com/
-  
+- https://docs.gofiber.io/template/html_v2.x.x/html/TEMPLATES_CHEATSHEET/
+
+
+
 **LOC counter**
 Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
 
 ## TODO
 
+- fix main.js - logout and other functions not working on the admin page
 - add data importers under the admin area for the courses, learners, offerings and learner exams
-  - start with the learners, easier with less fields and validation
+  - check if it is the correct file - contains header with correct fields
+  - check field count
+  - check field types and structure
+  - generate calculated data items - e.g examid
+  - generate exception report
 
 - use for dateime handling https://www.digitalocean.com/community/tutorials/how-to-use-dates-and-times-in-go
 - update the /dashboard page content  
@@ -28,6 +36,10 @@ Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
 - HTMX for SSE with go-HTMX & HTMX - https://github.com/donseba/go-htmx, https://htmx.org/   
 - AI text reviewer with LangChainGo - https://github.com/tmc/langchaingo
   - https://tmc.github.io/langchaingo/docs/tutorials/code-reviewer
+  - https://eli.thegreenplace.net/2023/using-ollama-with-langchaingo/
+  - https://eli.thegreenplace.net/2024/gemma-ollama-and-langchaingo/
+  - https://github.com/eliben/code-for-blog/tree/main/2023/ollama-go-langchain
+    - C:\devwork\code-for-blog\2023
 
 ### dashboard metrics
 
