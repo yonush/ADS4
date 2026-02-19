@@ -1,0 +1,107 @@
+<!-- This template is for the bulk data importer in the admin panel -->
+<script>
+    // some simple JS code to dispatch the routes
+    const xhttp = new XMLHttpRequest();
+    
+    function btnImport(route) {
+        switch (route) {
+        case 'course':
+            xhttp.open("POST", "/importcourses", true);
+            break;
+        case 'learner':
+            xhttp.open("POST", "/importlearners", true);
+            break;
+        case 'learnerexam':
+            xhttp.open("POST", "/importlearnerexams", true);
+            break;
+        case 'offering':
+            xhttp.open("POST", "/importofferings", true);
+            break; 
+        default:    
+            xhttp.open("GET", "/admin", true);            
+        
+        }
+        xhttp.send();
+    }
+</script>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="my-3">Course bulk data importer (e.g courses.csv)</h3>
+    </div>
+
+    <div class="overflow-y-scroll" style="max-height: 50vh">
+        <form class="form-control" method="POST" id="importCoursesForm" action="/importcourses"
+            autocomplete="off" enctype="multipart/form-data" novalidate>
+            <div class="mb-3">
+                <label for="purgeCoursesData" class="form-label">Purge existing courses?</label>
+                <input type="checkbox" id="purgedata" name="purgeCoursesData" value="0">
+            </div>
+            <div class="mb-3">                    
+                Course CSV file: <input type="file" name="datafile" ><br><br>
+                <button type="button" class="btn btn-info" onclick="btnImport('course')">Import Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="my-3">Learner bulk data importer (e.g learners.csv)</h3>
+    </div>
+
+    <div class="overflow-y-scroll" style="max-height: 50vh">
+        <form class="form-control" method="POST" id="importLearnerForm" action="/importlearners"
+            autocomplete="off" enctype="multipart/form-data" novalidate>
+            <div class="mb-3">
+                <label for="purgeLearnerData" class="form-label">Purge existing learners?</label>
+                <input type="checkbox" id="purgedata" name="purgeLearnerData" value="0">
+            </div>
+            <div class="mb-3">    
+                Learner CSV file: <input type="file" name="datafile" ><br><br>
+
+                <button type="button" class="btn btn-info" onclick="btnImport('learner')">Import Data</button>
+            </div>    
+        </form>
+    </div>
+</div>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="my-3">Learner exam bulk data importer (learnerexams.CSV)</h3>
+    </div>
+
+    <div class="overflow-y-scroll" style="max-height: 50vh">
+        <form class="form-control" method="POST" id="importLearnerExamForm" action="/importlearnerexams"
+            autocomplete="off" enctype="multipart/form-data" novalidate>
+            <div class="mb-3">
+                <label for="purgeLearnerExamData" class="form-label">Purge existing learner exams?</label>
+                <input type="checkbox" id="purgedata" name="purgeLearnerExamData" value="0">
+            </div>
+            <div class="mb-3">                    
+                Learner exam CSV file: <input type="file" name="datafile" ><br><br>
+                <button type="button" class="btn btn-info" onclick="btnImport('learnerexam')">Import Data</button>
+            </div>    
+        </form>
+    </div>
+</div>
+
+<div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="my-3">Offering bulk data importer (offerings.csv)</h3>
+    </div>
+
+    <div class="overflow-y-scroll" style="max-height: 50vh">
+        <form class="form-control" method="POST" id="importOfferingsForm" action="/importofferings"
+            autocomplete="off" enctype="multipart/form-data" novalidate>
+            <div class="mb-3">
+                <label for="purgeOfferingData" class="form-label">Purge existing offerings?</label>
+                <input type="checkbox" id="purgedata" name="purgeOfferingData" value="0">
+            </div>
+            <div class="mb-3">                    
+                Offerings CSV file: <input type="file" name="datafile" ><br><br>
+                <button type="button" class="btn btn-info" onclick="btnImport('offering')">Import Data</button>
+            </div>    
+        </form>
+    </div>
+</div>

@@ -43,6 +43,8 @@
                             Dashboard
                         </a>
                     </li>
+
+                    {{if eq .role "Admin" }}
                     <li class="nav-item text-center mx-2 mx-lg-1">
                         <a class="nav-link" href="/admin">
                             <div>
@@ -50,7 +52,20 @@
                             </div>
                             System Admin 
                         </a>
-                    </li>                   
+                    </li>
+                    {{end}}
+
+                    {{if eq .role "Faculty" }}
+                    <li class="nav-item text-center mx-2 mx-lg-1">
+                        <a class="nav-link" href="/admin">
+                            <div>
+                                <i class="fas fa-gear fa-lg mb-1"></i>
+                            </div>
+                            Data Importers 
+                        </a>
+                    </li>
+                    {{end}}
+                 
                 </ul>
                 <!-- Right links -->
                 <ul class="navbar-nav ms-auto d-flex flex-row mt-3 mt-lg-0">
@@ -72,7 +87,6 @@
                             <div>Dark Mode</div>
                         </a>
                     </li>
-
 
                     <li class="nav-item dropdown text-center mx-2 mx-lg-1">
                         <a

@@ -11,7 +11,6 @@
             href="/static/assets/app_icon.png"
             sizes="16x16"
         />
-
          
         <!-- jQuery -->
         <script src="/static/common/jquery.min.js"></script>
@@ -20,29 +19,19 @@
         <link
             href="/static/common/bootstrap.min.css"
             rel="stylesheet"
-            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-            crossorigin="anonymous"
         />
         <!-- Bootstrap JS -->
         <script
             src="/static/common/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"
         ></script>
         <!-- Toastify JS -->
         <script
             src="/static/common/toastify.js"
-            integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
         ></script>
         <!-- Toastify CSS-->
         <link
             rel="stylesheet"
             href="/static/common/toastify.css"
-            integrity="sha512-VSD3lcSci0foeRFRHWdYX4FaLvec89irh5+QAGc00j5AOdow2r5MFPhoPEYBUQdyarXwbzyJEO7Iko7+PnPuBw=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
         />
             <!-- Font Awesome -->
         <!-- Font Awesome -->
@@ -53,7 +42,7 @@
         
         <!-- Custom CSS -->
         <link rel="stylesheet" href="/static/main/main.css" />
-        <script type="text/javascript">
+        <script type="text/javascript">           
             $(document).ready(function () {
                 // Function to get query parameters by name
                 function getQueryParameter(param) {
@@ -95,6 +84,8 @@
                     window.history.replaceState({}, document.title, "/admin");
                 }
             });
+
+
         </script>
     </head>
     <body>
@@ -103,27 +94,14 @@
 
         <div class="container">
             <!-- Manage Users -->
-            {{ template "user_list.html" . }}
-
+            {{if eq .role "Admin"}}
+                {{ template "user_list.html" . }}
+            {{end}}
             <div>
-                <h2>Learner Exam import</h2>
-
+                <h2>Bulk data importers</h2>
+                {{ template "import_data.html" . }}
             </div>
             
-            <div>
-                <h2>Exam Offerings import</h2>
-
-            </div>
-            <div>
-                <h2>Learner import</h2>
-
-            </div>
-
-            <div>
-                <h2>Course import</h2>
-
-            </div>
-
             <!-- Notifications modal -->
             {{ template "notifications.html" . }}
         </div>
@@ -139,7 +117,6 @@
         </script>
         <script type="module" src="/static/main/notifications.js"></script>
         <script type="module" defer src="/static/main/main.js"></script>
-
         <script type="module" defer src="/static/admin/admin.js"></script>
     </body>
-</html>
+</html> 

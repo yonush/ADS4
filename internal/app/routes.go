@@ -12,14 +12,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// AdminOnly middleware
+// AdminOnly middleware where Admin and Faculty are administrators
+// Admin role allows for user account management
 func (a *App) AdminOnly(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
 		claims := user.Claims.(jwt.MapClaims)
 		role := claims["role"]
 
-		if role != "Admin" {
+		if role != "Admin" && role != "Faculty" {
 			return c.Redirect(http.StatusUnauthorized, "/dashboard?error=You%20do%20not%20have%20permission%20to%20access%20this%20page")
 		}
 		return next(c)
@@ -88,8 +89,13 @@ func (a *App) initRoutes() {
 	admin.GET("/admin", a.HandleGetAdmin)
 	admin.GET("/shutdown", a.HandeGetShutdown) //admin only route to shutdown the server, for testing purposes
 	//admin.GET("/yearlist", a.HandleGetYearList) //list of available years for the offerings
+	//Bulk data importer routers
+	admin.POST("/importlearners", a.HandlePostImportLearner)
+	admin.POST("/importcourses", a.HandlePostImportCourses)
+	admin.POST("/importlearnerexams", a.HandlePostImportLearnerExams)
+	admin.POST("/importofferings", a.HandlePostImportOfferings)
 
-	// User management routes
+	// User management CRUD routes
 	admin.POST("/api/user", a.HandlePostUser)
 	admin.GET("/api/user", a.HandleGetAllUsers)
 	admin.GET("/api/user/:username", a.HandleGetUserByUsername)
@@ -97,16 +103,17 @@ func (a *App) initRoutes() {
 	admin.DELETE("/api/user/:id", a.HandleDeleteUser)
 
 	//exam offering management CRUD routes
-	admin.POST("/offering", a.HandlePostOffering)
-	admin.GET("/offering", a.HandleGetAllOfferings)
-	admin.GET("/offering/:examid", a.HandleGetOfferingByID)
-	admin.PUT("/offering/:examid", a.HandlePutOffering)
-	admin.DELETE("/offering/:examid", a.HandleDeleteOffering)
+	admin.POST("/api/offering", a.HandlePostOffering)
+	admin.GET("/api/offering", a.HandleGetAllOfferings)
+	admin.GET("/api/offering/:examid", a.HandleGetOfferingByID)
+	admin.PUT("/api/offering/:examid", a.HandlePutOffering)
+	admin.DELETE("/api/offering/:examid", a.HandleDeleteOffering)
 
 	//learner exam management CRUD routes
-	admin.POST("/learnerexam", a.HandlePostLearnerExam)
-	admin.GET("/learnerexam", a.HandleGetAllLearnerExams)
-	admin.GET("/learnerexam/:studentid/:examid", a.HandleGetLearnerExamByID)
-	admin.PUT("/learnerexam/:studentid/:examid", a.HandlePutLearnerExam)
-	admin.DELETE("/learnerexam/:studentid/:examid", a.HandleDeleteLearnerExam)
+	admin.POST("/api/learnerexam", a.HandlePostLearnerExam)
+	admin.GET("/api/learnerexam", a.HandleGetAllLearnerExams)
+	admin.GET("/api/learnerexam/:studentid/:examid", a.HandleGetLearnerExamByID)
+	admin.PUT("/api/learnerexam/:studentid/:examid", a.HandlePutLearnerExam)
+	admin.DELETE("/api/learnerexam/:studentid/:examid", a.HandleDeleteLearnerExam)
+
 }

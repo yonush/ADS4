@@ -9,7 +9,8 @@
 
 - https://www.sqlite.org/pragma.html#pragma_synchronous
 - https://github.com/mattn/go-sqlite3?tab=readme-ov-file
-
+- https://go-sponge.com/
+  
 **LOC counter**
 Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
 
@@ -23,7 +24,13 @@ Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
 
 - consider timestamping the actual questions in the assessment tool
   
+- Template with templ - https://github.com/a-h/templ
+- HTMX for SSE with go-HTMX & HTMX - https://github.com/donseba/go-htmx, https://htmx.org/   
+- AI text reviewer with LangChainGo - https://github.com/tmc/langchaingo
+  - https://tmc.github.io/langchaingo/docs/tutorials/code-reviewer
+
 ### dashboard metrics
+
 Exam progression ready->active->expired|closed->marked
 
 Course code, description, examid, yr, semester, ready, active, expired, closed, marked
@@ -56,8 +63,6 @@ block
 		id5("*_handlers.go")
 	end	
 	
-	
-
 ```
 
 app/app.go - udpate to include certificate handling. Include domain in the config.
@@ -71,30 +76,13 @@ app/routes.go - update these to reflect the new routes
 
 ## ADS4/templates
 
-- Update the templates to reflect the new views
-- Keep the admin/main, admin/authentication and admin/dashboard
-- Update admin/dashboard with the new metrics display. Remove refernces to device management.
-- remove admin/inspection
-
-**templates/admin**
-- update admin/ with new views
-- remove admin/building_management, admin/device_type_management, admin/room_management, admin/site_management
-- keep admin/user_management
-- update admin/admin.html with toast and templates
-- keep admin/admin_navbar.html
+- Add the CRUD templates for the new handlers
 
 ## ADS4/static
 **ADS4/static/admin**
 - Update admin.css
 - Update admin.js and remove old handler JS. Replace with new handler functionality
 
-**ADS4/static/assets**
-- add new user guide
-- update app logo
-
-**ADS4/static/authentication**
-- keep this folder
-  
 **ADS4/static/dashboard**
 - Update JS with new functionality
 
@@ -102,8 +90,5 @@ app/routes.go - update these to reflect the new routes
 - udpate notifications.js with new notification handlers
 - remove inspections.js
 - keep main.js
-
-**ADS4/static/site_maps**
-- remove this folder and contents
 
 

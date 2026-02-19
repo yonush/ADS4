@@ -43,7 +43,7 @@
                             Dashboard
                         </a>
                     </li>
-                    {{if eq .role "Admin"}}
+                    {{if eq .role "Admin" }}
                     <li class="nav-item text-center mx-2 mx-lg-1">
                         <a class="nav-link" href="/admin">
                             <div>
@@ -53,6 +53,18 @@
                         </a>
                     </li>
                     {{end}}
+
+                    {{if eq .role "Faculty" }}
+                    <li class="nav-item text-center mx-2 mx-lg-1">
+                        <a class="nav-link" href="/admin">
+                            <div>
+                                <i class="fas fa-gear fa-lg mb-1"></i>
+                            </div>
+                            Data Importers 
+                        </a>
+                    </li>
+                    {{end}}
+
                     
                     {{if eq .username "Guest"}}
                     <li class="nav-item text-center mx-2 mx-lg-1">
