@@ -1,18 +1,25 @@
 # ADS4 Todo & summary of changes
 
 - Consider upgrading from Echo v4 to Echo v5.
-- Changed to SQlite for portablility but include support for PosgreSQL for scalability
 - Consider using templ for embedding the templates 
 - Include CORS and CSRF protections
   
 - change main page to include basic metrics without logging into the system
+- improve the imported to include feedback  
 
 - https://www.sqlite.org/pragma.html#pragma_synchronous
 - https://github.com/mattn/go-sqlite3?tab=readme-ov-file
 - https://go-sponge.com/
 - https://docs.gofiber.io/template/html_v2.x.x/html/TEMPLATES_CHEATSHEET/
 
-
+- need to add a filter based on the semster poeriod. In other words the dashboard on shows the current exams based on S1-S3 and year
+- admin.html -> fix/remove the following as this si a security risk
+          <script>
+            var role = "{{.role}}";
+            var current_user_id = "{{.user_id}}";
+            var user_id = "{{.user_id}}";
+            var is_current_user_default_admin = "{{.default_admin}}";
+        </script>
 
 **LOC counter**
 Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line

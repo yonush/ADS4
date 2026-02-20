@@ -101,18 +101,6 @@
         <!-- Map and Device List table -->
         {{ template "offering_list.html" . }}
 
-        <!-- Notifications modal -->
-        {{ template "notifications.html" . }}
-
-        <!-- View Notes Modal-->
-        {{ template "notes_modal.html" . }}
-
-        <!-- Add Device Modal -->
-        {{ template "add_offering.html" . }}
-
-        <!-- Edit Device Modal -->
-        {{ template "edit_offering.html" . }}
-
         <!-- Delete device modal -->
         {{ template "delete_modal.html" . }}
 
@@ -120,15 +108,12 @@
         <!-- Footer -->
         {{ template "footer.html" . }}
 
-
-
         <!-- Custom JS-->
         <script>
             var role = "{{.role}}";
 
             var user_id = "{{.user_id}}";
         </script>
-        <script type="module" src="/static/main/notifications.js"></script>
         <script type="module" src="/static/main/main.js"></script>
         <script
             type="module"

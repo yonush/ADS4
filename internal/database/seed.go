@@ -1,18 +1,14 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/gocarina/gocsv"
 	"github.com/joho/godotenv"
 
 	"ADS4/internal/config"
-	"ADS4/internal/models"
 
 	_ "github.com/lib/pq" // Import the PostgreSQL driver
 	"golang.org/x/crypto/bcrypt"
@@ -78,7 +74,7 @@ func (s *SeedStatus) MarkDataAsSeeded() error {
 	return nil
 }
 
-func SeedDatabase(db *sql.DB) error {
+func SeedDatabase(db *DB) error {
 	seedStatus := NewSeedStatus()
 
 	if !seedStatus.IsDataSeeded() {
@@ -95,7 +91,7 @@ func SeedDatabase(db *sql.DB) error {
 	return nil
 }
 
-func SeedData(db *sql.DB) {
+func SeedData(db *DB) {
 	// Get admin password from .env
 	adminPassword := config.LoadConfig().AdminPassword
 	datadir := config.LoadConfig().DataDir
@@ -121,7 +117,6 @@ func SeedData(db *sql.DB) {
 	}
 
 	log.Println("Seeding data...")
-
 	// Insert Users - user names must be at least 6 characters
 	_, err = db.Exec(`
 		INSERT INTO UserT (username, password, role, email, defaultadmin)
@@ -137,102 +132,33 @@ func SeedData(db *sql.DB) {
 		log.Printf("- bobbyx user exists, skipping faculty user creation")
 	}
 
+	// purge and import new data
 	log.Println("Importing course & offerings data.")
-	log.Printf("- Purging current demo data")
-	_, err = db.Exec(`DELETE FROM learnerexams; DELETE FROM learners; DELETE FROM offerings; DELETE FROM courses;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	//important note: the CSV files must be in the same order as the database tables to avoid foreign key constraint errors when seeding
 	log.Printf("- Reading %v/courses.csv", datadir)
-	f, err := os.Open(datadir + "/courses.csv")
+	err = db.ImportCourses(datadir+"/courses.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
-	}
-	defer f.Close()
-
-	var courses []*models.CoursesCSV
-	if err = gocsv.UnmarshalFile(f, &courses); err != nil {
-		log.Fatal(err)
-	}
-
-	for _, course := range courses {
-		_, err = db.Exec(`
-			INSERT INTO Courses (CourseCode, Description, Level, Status)
-			VALUES ($1, $2, $3, $4)`, course.CourseCode, course.Description, course.Level, course.Status)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	log.Printf("- Reading %v/offerings.csv", datadir)
-	f, err = os.Open(datadir + "/offerings.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	var offerings []*models.OfferingsCSV
-	if err = gocsv.UnmarshalFile(f, &offerings); err != nil {
-		log.Fatal(err)
-	}
-
-	for _, offering := range offerings {
-		_, err = db.Exec(`
-				INSERT INTO Offerings (ExamID, Year, Semester, CourseCode, Password, Status, Coordinator, OwnerID, Duration)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-			offering.ExamID, offering.Year, offering.Semester, strings.TrimSpace(offering.CourseCode),
-			offering.Password, offering.Status, offering.Coordinator, offering.OwnerID, offering.Duration)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 
 	log.Printf("- Reading %v/learners.csv", datadir)
-	f, err = os.Open(datadir + "/learners.csv")
+	err = db.ImportLearners(datadir+"/learners.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 
-	var learners []*models.LearnerCSV
-	if err = gocsv.UnmarshalFile(f, &learners); err != nil {
+	log.Printf("- Reading %v/offerings.csv", datadir)
+	err = db.ImportOfferings(datadir+"/offerings.csv", true, false)
+	if err != nil {
 		log.Fatal(err)
-	}
-
-	for _, learner := range learners {
-		_, err = db.Exec(`
-				INSERT INTO Learners (StudentID, Name, Status)
-				VALUES ($1, $2, $3)`, learner.StudentID, learner.StudentName, learner.Status)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 
 	log.Printf("- Reading %v/learnerexams.csv", datadir)
-	f, err = os.Open(datadir + "/learnerexam.csv")
+	err = db.ImportLearnerExams(datadir+"/learnerexams.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 
-	var learnerexams []*models.LearnerExamCSV
-	if err = gocsv.UnmarshalFile(f, &learnerexams); err != nil {
-		log.Fatal(err)
-	}
-
-	for _, learnerexam := range learnerexams {
-		_, err = db.Exec(`
-				INSERT INTO learnerexams (StudentID, ExamID, StartTime, EndTime,Status, Grade)
-				VALUES ($1, $2, $3, $4, $5, $6)`,
-			learnerexam.StudentID, learnerexam.ExamID, learnerexam.StartTime, learnerexam.EndTime,
-			learnerexam.Status, learnerexam.Grade)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	// Create a temp file in .internal/ directory
-
+	// Create a temp file in data/ directory
 	tempFile, err := os.Create(datadir + "/seed_complete")
 	if err != nil {
 		log.Fatal(err)

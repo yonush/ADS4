@@ -61,7 +61,7 @@ func NewApp(cfg config.Config) *App {
 	router.Use(middleware.RequestLogger()) // Log requests
 	router.Use(middleware.Recover())       // Recover from panics
 	router.Use(middleware.CORS())          // Enable CORS
-	router.Use(utils.LoggingMiddleware)
+	//router.Use(utils.LoggingMiddleware)
 
 	// Initialize Database
 	db, err := database.NewDB(cfg)
@@ -71,7 +71,7 @@ func NewApp(cfg config.Config) *App {
 
 	// Seed database
 	// Initialize database and seed data if needed
-	if err := database.SeedDatabase(db.DB); err != nil {
+	if err := database.SeedDatabase(db); err != nil {
 		panic(err)
 	}
 

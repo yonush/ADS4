@@ -91,7 +91,7 @@ func (a *App) HandlePostExamUpload(c echo.Context) error {
 	}
 	src, err := examfile.Open()
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to access the source exam file"})
 	}
 	defer src.Close()
 

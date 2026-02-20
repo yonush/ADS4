@@ -1,57 +1,5 @@
-import {
-    clearAllNotifications,
-    clearNotificationById,
-    updateNotificationsUI,
-} from "/static/main/notifications.js";
-
 export function logout() {
     window.location.href = "/logout";
-}
-
-export function viewNotifications() {
-    $("#notificationsModal").modal("show");
-}
-
-export function clearAllNotificationsHandler() {
-    clearAllNotifications();
-}
-
-export function clearNotificationHandler(deviceId) {
-    clearNotificationById(deviceId);
-}
-
-export async function refreshNotificationsHandler() {
-    const refreshButton = document.getElementById("refreshNotificationsBtn");
-
-    // Disable the button immediately to prevent further clicks while processing
-    if (refreshButton.disabled) return; // Prevent further clicks
-
-    try {
-        if (refreshButton) {
-            refreshButton.disabled = true;
-            const icon = refreshButton.querySelector(".fa-sync-alt");
-            if (icon) {
-                icon.classList.add("fa-spin");
-            }
-        }
-
-        // Clear session storage to force fresh data
-        sessionStorage.removeItem("notifications");
-        sessionStorage.removeItem("clearedNotifications");
-
-        // Get fresh notifications and update UI
-        await updateNotificationsUI();
-    } catch (error) {
-        console.error("Error refreshing notifications:", error);
-    } finally {
-        if (refreshButton) {
-            refreshButton.disabled = false;
-            const icon = refreshButton.querySelector(".fa-sync-alt");
-            if (icon) {
-                icon.classList.remove("fa-spin");
-            }
-        }
-    }
 }
 
 function formatEntityType(entityType) {
@@ -228,10 +176,6 @@ if (savedTheme) {
 
 // Make functions available to the browser
 window.logout = logout;
-window.viewNotifications = viewNotifications;
-window.clearAllNotificationsHandler = clearAllNotificationsHandler;
-window.clearNotificationHandler = clearNotificationHandler;
-window.refreshNotificationsHandler = refreshNotificationsHandler;
 window.showDeleteModal = showDeleteModal;
 window.toggleDarkMode = toggleDarkMode;
 window.populateDropdown = populateDropdown;

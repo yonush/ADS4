@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>EDMS Register</title>
+        <title>ADS4 Register</title>
         <!-- favicon-->
         <link
             rel="icon"
@@ -240,7 +240,7 @@
             // hot reaload
             if (window.EventSource) {
                 new EventSource(
-                    "http://localhost:8090/internal/reload"
+                    "http://localhost:8088/internal/reload"
                 ).onmessage = () => {
                     setTimeout(() => {
                         location.reload();

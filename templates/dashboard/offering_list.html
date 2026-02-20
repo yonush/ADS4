@@ -1,17 +1,6 @@
 <!-- This is the exam offering list component of the dashboard page -->
 <div class="container-fluid">
     <div class="row mx-lg-2">
-        <div class="my-4 d-flex justify-content-between">
-            <!-- Add Offering button -->
-            {{ if eq .role "Admin" }}
-            <div>
-                <button class="btn btn-success" onclick="addOffering()">
-                    Add Exam Offering <i class="fa fa-plus"></i>
-                </button>
-            </div>
-            {{ end }}
-        </div>
-
         <!-- Exam offering List Section -->
         <div class="device-list col-xxl-12">
             <div class="d-flex justify-content-end"></div>
@@ -97,41 +86,7 @@
                     </div>
                 </div>
 
-               
-                <!-- Status Filter -->
-                <div class="position-relative flex-grow-1 mt-2 mt-xl-0 mx-2">
-                    <label
-                        for="statusFilter"
-                        class="form-label"
-                        style="margin-bottom: 0.25rem"
-                        >Status</label
-                    >
-                    <div class="position-relative">
-                        <i
-                            class="fa-solid fa-filter position-absolute"
-                            style="
-                                left: 10px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                pointer-events: none;
-                                font-size: 0.85rem;
-                            "
-                        ></i>
-                        <select
-                            id="statusFilter"
-                            class="form-select"
-                            style="padding-left: 2.5rem; width: 100%"
-                        >
-                            <option selected>All Statuses</option>
-                            <option value="ready">Ready</option>
-                            <option value="active">Active</option>
-                            <option value="expired">Expired</option>
-                            <option value="closed">Closed</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Clear Filters Button -->
+                               <!-- Clear Filters Button -->
                 <button
                     type="button"
                     class="btn btn-secondary align-self-end mt-2 mt-xl-0 mx-2 ms-lg-0 ms-xl-2 me-lg-0"

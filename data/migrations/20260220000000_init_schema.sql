@@ -30,8 +30,8 @@ CREATE TABLE "Offerings" (
     "Duration"    INTEGER,
     PRIMARY KEY("ExamID"),
     UNIQUE("ExamID"),
-    FOREIGN KEY("Coordinator") REFERENCES "UserT"("UserID"),
-    FOREIGN KEY("OwnerID") REFERENCES "UserT"("UserID"),
+    -- FOREIGN KEY("Coordinator") REFERENCES "UserT"("UserID"),
+    -- FOREIGN KEY("OwnerID") REFERENCES "UserT"("UserID"),
     FOREIGN KEY("CourseCode") REFERENCES "Courses"("CourseCode"),
 	CHECK (Status IN ('active','closed')),
 	CHECK ("Semester" IN ('S1','S2','S3')),
@@ -64,7 +64,7 @@ CREATE TABLE "Learnerexams" (
     "Grade"         INTEGER,
     PRIMARY KEY("LearnerExamID" AUTOINCREMENT),
     FOREIGN KEY("ExamID") REFERENCES "Offerings"("ExamID"),
-    CHECK (Status IN ('ready', 'active', 'expire', 'closed', 'marked'))
+    CHECK (Status IN ('ready', 'active', 'expire', 'closed', 'marked')),
     FOREIGN KEY("StudentID") REFERENCES "Learners"("StudentID")    
 );
 CREATE INDEX learnerexams_byCourseCode ON learnerexams(StudentID);
@@ -79,7 +79,7 @@ CREATE TABLE "UserT" (
     "Email"     VARCHAR(255) UNIQUE NOT NULL,
     "Role"      VARCHAR(20) NOT NULL DEFAULT 'Learner',
     "DefaultAdmin"    BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY("UserID" AUTOINCREMENT)
+    PRIMARY KEY("UserID" AUTOINCREMENT),
     CHECK (Role IN ('Admin','Faculty','Learner'))
 );
 

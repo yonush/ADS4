@@ -1,39 +1,11 @@
 // dashboard.js
 
-// Leaflet map setup
-/*
-siteFilter becomes yearFilter
-buildingFilter becomes semesterFilter
-*/
-
-let map;
-function initializeMap(containerId, options = {}) {
-    const defaultOptions = {
-        crs: L.CRS.Simple,
-        minZoom: -1,
-    };
-    map = L.map(containerId, { ...defaultOptions, ...options });
-}
-
-function getFilterOptions() {
-    //TODO change this to retrieve the years from the database
-    //SELECT distinct year FROM examMetrics
-    fetchAndPopulateSelect(
-        "/api/site",
-        "yearFilter",
-        "year",
-        "year",
-        "Current Year"
-    );
-    setupSemesterFilter();
-    setupYearFilter();
-}
-
+//-----------------------------------------------------------------------------------------------------------
+//filtering controls
 export function clearFilters() {
     // Reset each filter dropdown to its first option (except site filter)
     document.getElementById("yearFilter").selectedIndex = 0;
     document.getElementById("semesterFilter").selectedIndex = 0;
-    document.getElementById("statusFilter").selectedIndex = 0;
     document.getElementById("searchInput").value = ""; // Clear search input
 
     // Reset active filters
@@ -43,9 +15,23 @@ export function clearFilters() {
         status: null,
     };
 
-    filteredDevices = [...allOfferings]; // Reset to original devices
+    filteredOfferings = [...allOfferings]; // Reset to original devices
     clearTableBody();
     loadOfferingsAndUpdateTable();
+}
+
+function getFilterOptions() {
+    //TODO change this to retrieve the years from the database
+    //SELECT distinct year FROM examMetrics
+    fetchAndPopulateSelect(
+        "/yearlist",
+        "yearFilter",
+        "year",
+        "year",
+        "Current Year"
+    );
+    setupSemesterFilter();
+    setupYearFilter();
 }
 
 function fetchAndPopulateSelect(
@@ -94,31 +80,30 @@ function setupSemesterFilter() {
     });
 }
 
-//TODO fix this filter
-function filterBySemester(buildingCode) {
-    const buildingFilter = document.getElementById("semesterFilter");
-    var siteId;
 
-    if (buildingCode) {
-        siteId = "1";
-        // Loop through `buildingFilter` options to select the one with matching text
-        for (const option of buildingFilter.options) {
-            if (option.text === buildingCode) {
+//-----------------------------------------------------------------------------------------------------------
+//filtering actions on the table
+//TODO fix this filter
+function filterBySemester(semester) {
+    const semesterFilter = document.getElementById("semesterFilter");
+
+    if (semester) {
+        // Loop through `semesterFilter` options to select the one with matching text
+        for (const option of semesterFilter.options) {
+            if (option.text === semester) {
                 option.selected = true;
                 break;
             }
         }
     } else {
-        // If `buildingCode` is not provided, use the selected dropdown value
-        buildingCode = buildingFilter.selectedOptions[0].text;
-        siteId = document.getElementById("siteFilter").value;
+        semester = semesterFilter.selectedOptions[0].text;
     }
 
     // Fetch devices based on `buildingCode` and `siteId`
-    if (buildingCode === "All Buildings" || buildingFilter.value === "") {
-        loadOfferingsAndUpdateTable("", siteId);
+    if (semester === "All Semesters" || semesterFilter.value === "") {
+        loadOfferingsAndUpdateTable("");
     } else {
-        loadOfferingsAndUpdateTable(buildingCode, siteId);
+        loadOfferingsAndUpdateTable(semester);
     }
 }
 
@@ -169,18 +154,17 @@ function clearTableBody() {
 }
 
 // Initialize the map and populate filter options
-initializeMap("map");
 getFilterOptions();
 
 let currentPage = 1;
 let rowsPerPage = 10;
 let allOfferings = [];
+let filteredOfferings = [];
 
 // Keep track of active filters
 let activeFilters = {
     year: null,
     semester: null,
-    status: null,
 };
 
 // Add event listeners for the new filters
@@ -196,19 +180,14 @@ document.getElementById("semesterFilter").addEventListener("change", () => {
     updateTable();
 });
 
-document.getElementById("statusFilter").addEventListener("change", () => {
-    filterTableByStatus();
-    clearTableBody();
-    updateTable();
-});
 
-let filteredDevices = [];
-export async function getAllExamOfferings(buildingCode = "", siteId = "") {
+
+
+async function getAllExamOfferings(semester = "") {
     try {
-        let url = "/api/emergency-device";
+        let url = "/offerings";
         const params = new URLSearchParams();
-        if (buildingCode) params.append("building_code", buildingCode);
-        if (siteId) params.append("site_id", siteId);
+        if (semester) params.append("semester", semester);
         if (params.toString()) url += `?${params.toString()}`;
 
         const response = await fetch(url);
@@ -217,23 +196,22 @@ export async function getAllExamOfferings(buildingCode = "", siteId = "") {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const devices = await response.json();
-        return devices; // Return the devices instead of storing in global variable
+        const offerings = await response.json();
+        return offerings; // Return the devices instead of storing in global variable
     } catch (err) {
-        console.error("Failed to fetch devices:", err);
+        console.error("Failed to fetch offerings:", err);
         return []; // Return empty array in case of error
     }
 }
 
-// Modify the dashboard version of getAllExamOfferings to update the table
-async function loadOfferingsAndUpdateTable(buildingCode = "", siteId = "") {
-    const devices = await getAllExamOfferings(buildingCode, siteId);
-    allOfferings = devices; // Update global variable if needed
-    filteredDevices = devices; // Initialize filtered devices
+async function loadOfferingsAndUpdateTable(semester="") {
+    const offerings = await getAllExamOfferings(semester);
+    allOfferings = offerings; // Update global variable if needed
+    filteredOfferings = offerings; // Initialize filtered devices
 
     updateTable();
 
-    if (devices.length === 0) {
+    if (offerings.length === 0) {
         const tbody = document.getElementById("exam-offering-body");
         if (tbody) {
             tbody.innerHTML = `<tr><td colspan="12" class="text-center">No devices found.</td></tr>`;
@@ -250,16 +228,16 @@ function updateTable() {
 
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    const pageDevices = filteredDevices.slice(startIndex, endIndex);
+    const pageOfferings = filteredOfferings.slice(startIndex, endIndex);
 
     // Clear table if no devices
-    if (!Array.isArray(pageDevices) || pageDevices.length === 0) {
+    if (!Array.isArray(pageOfferings) || pageOfferings.length === 0) {
         tbody.innerHTML = `<tr><td colspan="12" class="text-center">No devices found.</td></tr>`;
     } else {
-        tbody.innerHTML = pageDevices.map(formatDeviceRow).join("");
+        tbody.innerHTML = pageOfferings.map(formatOfferingRow).join("");
     }
 
-    updatePaginationControls();
+    updatePaginationControls(); 
 }
 
 // Filter functions for each criteria
@@ -299,21 +277,6 @@ function filterTableBySemester() {
     applyFilters();
 }
 
-function filterTableByStatus() {
-    const selectedStatus = document.getElementById("statusFilter").value;
-
-    // Check for either the default "Status" option or "All Statuses"
-    if (selectedStatus === "Status" || selectedStatus === "All Statuses") {
-        filteredOfferings = [...allOfferings];
-    } else {
-        filteredOfferings = allOfferings.filter(
-            //TODO: fix the status filter
-            (device) => device.status.String === selectedStatus
-        );
-    }
-    activeFilters.status = selectedStatus;
-    applyFilters();
-}
 
 // Apply all active filters
 function applyFilters() {
@@ -343,23 +306,255 @@ function applyFilters() {
                 device.emergency_device_type_name === activeFilters.semester
         );
     }
+    updateTable();
+}
 
-    // Apply status filter if active
+
+
+// Initial fetch without filtering
+loadOfferingsAndUpdateTable();
+/*
+<tr>
+    <th>Course Code ▲</th>
+    <th>Description ▲</th>
+    <th>Exam ID ▲</th>
+    <th>Password ▲</th>
+    <th>Ready ▲</th>
+    <th>Active ▲</th>
+    <th>Expired ▲</th>
+    <th>Closed ▲</th>
+    <th>Actions</th>
+</tr>
+*/
+//TODO update to show the offerings
+function formatOfferingRow(offering) {
+    if (!device) return "";
+    const formatDateMonthYear = (dateString) =>
+        formatDate(dateString, { month: "short", year: "numeric" });
+    const formatDateFull = (dateString) =>
+        formatDate(dateString, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            timeZone: "Pacific/Auckland",
+        });
+
+    const buttons = getActionButtons(offering);
+
+    // Declare isAdmin within the function
+    let isAdmin = false;
+
+    // Ensure role is defined and check for "Admin"
+    if (role === "Admin") {
+        isAdmin = true;
+    }
+
+    return `
+        <tr>
+            <td data-label="Device Type">${
+                device.emergency_device_type_name
+            }</td>
+            <td data-label="Extinguisher Type">${
+                device.extinguisher_type_name.String
+            }</td>
+            <td data-label="Building">${device.building_code}</td>
+            <td data-label="Room">${device.room_code}</td>
+            <td data-label="Serial Number">${device.serial_number.String}</td>
+            <td data-label="Manufacture Date">${formatDateMonthYear(
+                device.manufacture_date.Time
+            )}</td>
+            <td data-label="Expire Date">${formatDateMonthYear(
+                device.expire_date.Time
+            )}</td>
+            ${
+                isAdmin
+                    ? `<td data-label="Last Inspection Date">${formatDateFull(
+                          device.last_inspection_datetime.Time
+                      )}</td>`
+                    : ""
+            }
+            ${
+                isAdmin
+                    ? `<td data-label="Next Inspection Date">${formatDateFull(
+                          device.next_inspection_date.Time
+                      )}</td>`
+                    : ""
+            }
+            <td data-label="Size">${device.size.String}</td>
+
+            <td>
+                <div class="btn-group">
+                    ${buttons}
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function formatDate(dateString, options) {
+    if (!dateString || dateString === "0001-01-01T00:00:00Z") {
+        return "N/A";
+    }
+    return new Date(dateString).toLocaleString("en-NZ", {
+        timeZone: "Pacific/Auckland", // Ensure the correct timezone
+        ...options,
+    });
+}
+
+export function getActionButtons(offering) {
+    let buttons = `
+        <button class="btn btn-primary p-2" 
+                onclick="" 
+                title="View Notes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4"/>
+                <path d="M12 2v4"/>
+                <path d="M16 2v4"/>
+                <rect width="16" height="18" x="4" y="4" rx="2"/>
+                <path d="M8 10h6"/>
+                <path d="M8 14h8"/>
+                <path d="M8 18h5"/>
+            </svg>
+        </button>`;
+
+    if (role === "Admin") {
+        buttons += `
+            <button class="btn btn-warning p-2 ml-2" 
+                    onclick=""
+                    title="Edit Offering">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                    <path d="m15 5 4 4"/>
+                </svg>
+            </button>
+            <button class="btn btn-danger p-2 ml-2" 
+                    onclick=""
+                    title="Delete Offering">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" y1="11" x2="10" y2="17"/>
+                    <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+            </button>
+        `;
+    }
+    return buttons;
+}
+
+
+
+document.getElementById("searchInput").addEventListener("input", () => {
+    searchOfferings();
+});
+
+// Updated search function to use combined filtering approach
+//TODO update the search to look for offerings
+export async function searchOfferings() {
+    const searchInput = document.getElementById("searchInput");
+    const searchValue = searchInput.value.toLowerCase();
+
+    // First, reapply base filters to get fresh filtered state
+    // Start with all devices
+    let basefilteredOfferings = [...allOfferings];
+
+    // Apply active filters to get our base filtered state
+    if (activeFilters.room && activeFilters.room !== "All Rooms") {
+        basefilteredOfferings = basefilteredOfferings.filter(
+            (device) => device.room_code === activeFilters.room
+        );
+    }
+
+    if (
+        activeFilters.deviceType &&
+        activeFilters.deviceType !== "Device Type" &&
+        activeFilters.deviceType !== "All Device Types"
+    ) {
+        basefilteredOfferings = basefilteredOfferings.filter(
+            (device) =>
+                device.emergency_device_type_name === activeFilters.deviceType
+        );
+    }
+
     if (
         activeFilters.status &&
         activeFilters.status !== "Status" &&
         activeFilters.status !== "All Statuses"
     ) {
-        filteredOfferings = filteredOfferings.filter(
-            //TODO fix the filter application
+        basefilteredOfferings = basefilteredOfferings.filter(
             (device) => device.status.String === activeFilters.status
         );
+    }
+
+    // If search is empty, use just the filtered results
+    if (!searchValue) {
+        filteredOfferings = basefilteredOfferings;
+    } else {
+        // Apply search filter to the fresh filtered state
+        filteredOfferings = basefilteredOfferings.filter((device) => {
+            const baseSearch =
+                device.emergency_device_type_name
+                    .toLowerCase()
+                    .includes(searchValue) ||
+                device.extinguisher_type_name.String.toLowerCase().includes(
+                    searchValue
+                ) ||
+                device.room_code.toLowerCase().includes(searchValue) ||
+                device.serial_number.String.toLowerCase().includes(
+                    searchValue
+                ) ||
+                device.manufacture_date.Time.toLowerCase().includes(
+                    searchValue
+                ) ||
+                device.expire_date.Time.toLowerCase().includes(searchValue) ||
+                device.size.String.toLowerCase().includes(searchValue) ||
+                device.status.String.toLowerCase().includes(searchValue) ||
+                device.description.String.toLowerCase().includes(searchValue);
+
+            // Add admin-only fields if user is admin
+            if (role === "Admin") {
+                const lastInspectionFormatted = new Date(
+                    device.last_inspection_datetime.Time
+                )
+                    .toLocaleDateString("en-NZ", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                    })
+                    .toLowerCase();
+
+                const nextInspectionFormatted = new Date(
+                    device.next_inspection_date.Time
+                )
+                    .toLocaleDateString("en-NZ", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                    })
+                    .toLowerCase();
+
+                return (
+                    baseSearch ||
+                    lastInspectionFormatted.includes(searchValue) ||
+                    nextInspectionFormatted.includes(searchValue)
+                );
+            }
+
+            return baseSearch;
+        });
     }
 
     updateTable();
 }
 
-function updatePaginationControls() {
+//-----------------------------------------------------------------------------------------------------------
+//pagination functions
+
+export function updatePaginationControls() {
     const totalPages = Math.ceil(allOfferings.length / rowsPerPage);
     const paginationEl = document.querySelector(".pagination");
     const isMobile = window.innerWidth < 768; // Detect mobile devices
@@ -480,1054 +675,6 @@ document.getElementById("rowsPerPage").addEventListener("change", (e) => {
     updateTable();
 });
 
-// Initial fetch without filtering
-loadOfferingsAndUpdateTable();
-
-
-function formatDeviceRow(device) {
-    if (!device) return "";
-    const formatDateMonthYear = (dateString) =>
-        formatDate(dateString, { month: "short", year: "numeric" });
-    const formatDateFull = (dateString) =>
-        formatDate(dateString, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            timeZone: "Pacific/Auckland",
-        });
-
-    const badgeClass = getBadgeClass(device.status.String);
-    const buttons = getActionButtons(device);
-
-    // Declare isAdmin within the function
-    let isAdmin = false;
-
-    // Ensure role is defined and check for "Admin"
-    if (role === "Admin") {
-        isAdmin = true;
-    }
-
-    return `
-        <tr>
-            <td data-label="Device Type">${
-                device.emergency_device_type_name
-            }</td>
-            <td data-label="Extinguisher Type">${
-                device.extinguisher_type_name.String
-            }</td>
-            <td data-label="Building">${device.building_code}</td>
-            <td data-label="Room">${device.room_code}</td>
-            <td data-label="Serial Number">${device.serial_number.String}</td>
-            <td data-label="Manufacture Date">${formatDateMonthYear(
-                device.manufacture_date.Time
-            )}</td>
-            <td data-label="Expire Date">${formatDateMonthYear(
-                device.expire_date.Time
-            )}</td>
-            ${
-                isAdmin
-                    ? `<td data-label="Last Inspection Date">${formatDateFull(
-                          device.last_inspection_datetime.Time
-                      )}</td>`
-                    : ""
-            }
-            ${
-                isAdmin
-                    ? `<td data-label="Next Inspection Date">${formatDateFull(
-                          device.next_inspection_date.Time
-                      )}</td>`
-                    : ""
-            }
-            <td data-label="Size">${device.size.String}</td>
-            <td data-label="Status">
-                <span class="badge ${badgeClass}">${device.status.String}</span>
-            </td>
-            <td>
-                <div class="btn-group">
-                    ${buttons}
-                </div>
-            </td>
-        </tr>
-    `;
-}
-
-function formatDate(dateString, options) {
-    if (!dateString || dateString === "0001-01-01T00:00:00Z") {
-        return "N/A";
-    }
-    return new Date(dateString).toLocaleString("en-NZ", {
-        timeZone: "Pacific/Auckland", // Ensure the correct timezone
-        ...options,
-    });
-}
-
-function getBadgeClass(status) {
-    switch (status) {
-        case "Active":
-            return "text-bg-success";
-        case "Expired":
-            return "text-bg-warning";
-        case "Inspection Failed":
-            return "text-bg-danger";
-        case "Inactive":
-            return "text-bg-secondary";
-        default:
-            return "text-bg-warning";
-    }
-}
-
-export function getActionButtons(device) {
-    let buttons = `
-        <button class="btn btn-primary p-2" 
-                onclick="offeringNotes('${device.description.String}')" 
-                title="View Notes">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/>
-                <path d="M12 2v4"/>
-                <path d="M16 2v4"/>
-                <rect width="16" height="18" x="4" y="4" rx="2"/>
-                <path d="M8 10h6"/>
-                <path d="M8 14h8"/>
-                <path d="M8 18h5"/>
-            </svg>
-        </button>`;
-
-    if (role === "Admin") {
-        buttons += `
-            <button class="btn btn-warning p-2 ml-2" 
-                    onclick="editOffering(${device.emergency_device_id})"
-                    title="Edit Offering">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                    <path d="m15 5 4 4"/>
-                </svg>
-            </button>
-            <button class="btn btn-danger p-2 ml-2" 
-                    onclick="showDeleteModal(${device.emergency_device_id})"
-                    title="Delete Offering">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6h18"/>
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                    <line x1="10" y1="11" x2="10" y2="17"/>
-                    <line x1="14" y1="11" x2="14" y2="17"/>
-                </svg>
-            </button>
-        `;
-    }
-    return buttons;
-}
-
-// Function to clear building and room options
-function clearBuildingAndRoom() {
-    const buildingSelects = document.querySelectorAll(".buildingInput");
-    const roomSelects = document.querySelectorAll(".roomInput");
-    buildingSelects.forEach((select) => {
-        select.innerHTML =
-            "<option value='' selected disabled>Select a Building</option>";
-    });
-    roomSelects.forEach((select) => {
-        select.innerHTML =
-            "<option value='' selected disabled>Select a Room</option>";
-    });
-}
-
-export function addOffering() {
-    const addOfferingForm = document.getElementById("addOfferingForm");
-
-    if (addOfferingForm) {
-        addOfferingForm.reset();
-        addOfferingForm.classList.remove("was-validated");
-    }
-
-    // Hide extinguisher-specific fields by default
-    const extinguisherTypeDiv = document.querySelector(
-        ".ExtinguisherTypeInputDiv"
-    );
-    const expireDateDiv = document.getElementById("ExpireDateDiv");
-
-    if (extinguisherTypeDiv) extinguisherTypeDiv.classList.add("d-none");
-    if (expireDateDiv) expireDateDiv.classList.add("d-none");
-
-    // Make expiry date read-only by default
-    document.getElementById("ExpireDate").readOnly = true;
-
-    const promises = [
-        populateDropdown(
-            ".emergencyDeviceTypeInput",
-            "/api/emergency-device-type",
-            "Select Device Type",
-            "emergency_device_type_id",
-            "emergency_device_type_name"
-        ),
-        populateDropdown(
-            ".extinguisherTypeInput",
-            "/api/extinguisher-type",
-            "Select Extinguisher Type",
-            "extinguisher_type_id",
-            "extinguisher_type_name"
-        ),
-
-    ];
-
-    Promise.all(promises)
-        .then(() => {
-            // Event listener for site change
-            document
-                .querySelector(".siteInput")
-                .addEventListener("change", (event) => {
-                    const selectedSiteId = event.target.value;
-                    clearBuildingAndRoom();
-
-                    if (selectedSiteId) {
-                        fetchAndPopulateBuildings(selectedSiteId);
-                    }
-                });
-
-            // Event listener for building change
-            document
-                .querySelector(".buildingInput")
-                .addEventListener("change", (event) => {
-                    const selectedBuildingId = event.target.value;
-
-                    if (selectedBuildingId) {
-                        fetchAndPopulateRooms(selectedBuildingId);
-                    }
-                });
-
-            // Find manufacture date input within the form
-            const manufactureDateInput =
-                document.getElementById("manufactureDate");
-            if (manufactureDateInput) {
-                manufactureDateInput.addEventListener(
-                    "change",
-                    function (event) {
-                        const deviceType = document.querySelector(
-                            ".emergencyDeviceTypeInput"
-                        );
-                        const selectedText =
-                            deviceType?.options[deviceType.selectedIndex]
-                                ?.text || "";
-
-                        // Clear custom validity if manufacture date is valid
-                        const statusInput = document.getElementById("status"); // Adjust ID if needed
-                        const statusFeedback =
-                            document.getElementById("statusFeedback");
-                        const manufactureDateFeedback = document.getElementById(
-                            "addManufactureDateFeedback"
-                        );
-
-                        if (event.target.value) {
-                            // If a valid date is entered, clear any previous custom validity messages
-                            statusInput.setCustomValidity("");
-                            statusFeedback.textContent = "";
-                            manufactureDateInput.setCustomValidity("");
-                            manufactureDateFeedback.textContent = "";
-                        }
-
-                        // Additional validation if the status is set to "Expired"
-                        if (
-                            statusInput.value === "Expired" &&
-                            !event.target.value
-                        ) {
-                            statusInput.setCustomValidity(
-                                "Please enter a manufacture date before setting status to 'Expired'"
-                            );
-                            statusFeedback.textContent =
-                                "Please enter a manufacture date before setting status to 'Expired'";
-                            manufactureDateInput.setCustomValidity(
-                                "Please enter a manufacture date before setting status to 'Expired'"
-                            );
-                            manufactureDateFeedback.textContent =
-                                "Please enter a manufacture date before setting status to 'Expired'";
-                        }
-
-                        // Calculate and set expiry date for fire extinguishers
-                        if (
-                            selectedText
-                                .toLowerCase()
-                                .includes("fire extinguisher")
-                        ) {
-                            const expiryDate = new Date(event.target.value);
-                            expiryDate.setFullYear(
-                                expiryDate.getFullYear() + 5
-                            );
-                            const formattedDate = expiryDate
-                                .toISOString()
-                                .split("T")[0];
-
-                            const expireDateInput =
-                                document.getElementById("ExpireDate");
-
-                            if (expireDateInput) {
-                                expireDateInput.value = formattedDate;
-                                expireDateInput.readOnly = true;
-                                expireDateInput.disabled = true;
-                            } else {
-                                console.log("Could not find expiry date input");
-                            }
-                        }
-                    }
-                );
-            } else {
-                console.error("Could not find manufacture date input element");
-            }
-
-            const modal = document.getElementById("addOfferingModal");
-
-            if (modal) {
-                $(modal).modal("show");
-            }
-        })
-        .catch((error) => {
-            console.error("Error in addDevice:", error);
-        });
-}
-
-function editOffering(examID) {
-    // Clear the form before showing the modal
-    document.getElementById("editOfferingForm").reset();
-    document.getElementById("editOfferingForm").classList.remove("was-validated");
-    document.getElementById("editExamID").value = examID;
-
-    // Fetch the dropdown data
-    //TODO update the dropdowns for the coordinator and owner fields
-    const coordinatorPromise = populateDropdown(
-        ".emergencyDeviceTypeInput",
-        "/api/emergency-device-type",
-        "Select Device Type",
-        "emergency_device_type_id",
-        "emergency_device_type_name"
-    );
-
-    const ownerPromise = populateDropdown(
-        ".extinguisherTypeInput",
-        "/api/extinguisher-type",
-        "Select Extinguisher Type",
-        "extinguisher_type_id",
-        "extinguisher_type_name"
-    );
-
-
-    // Wait for all dropdowns to be populated before proceeding
-    Promise.all([
-        coordinatorPromise,
-        ownerPromise,
-    ])
-        .then(() => {
-            // Event listener for site change
-            document
-                .querySelector(".editSiteInput")
-                .addEventListener("change", (event) => {
-                    const selectedSiteId = event.target.value;
-                    clearBuildingAndRoom();
-
-                    if (selectedSiteId) {
-                        fetchAndPopulateBuildings(selectedSiteId);
-                    }
-                });
-
-            // Event listener for building change
-            document
-                .querySelector(".editBuildingInput")
-                .addEventListener("change", (event) => {
-                    const selectedBuildingId = event.target.value;
-
-                    if (selectedBuildingId) {
-                        fetchAndPopulateRooms(selectedBuildingId);
-                    }
-                });
-
-            // Fetch the device data
-            fetch(`/api/emergency-device/${deviceId}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    // Populate the form with the data
-                    document.getElementById(
-                        "editEmergencyDeviceTypeInput"
-                    ).value = data.emergency_device_type_id;
-                    document.getElementById("editExtinguisherTypeInput").value =
-                        data.extinguisher_type_id.Int64;
-                    document.getElementById("editSerialNumberInput").value =
-                        data.serial_number.String;
-                    document.getElementById("editManufactureDateInput").value =
-                        data.manufacture_date.Time.split("T")[0];
-                    document.getElementById("editSizeInput").value =
-                        data.size.String;
-                    document.getElementById("editDescriptionInput").value =
-                        data.description.String;
-                    document.getElementById("editSiteInput").value =
-                        data.site_id;
-                    document.getElementById("editStatusInput").value =
-                        data.status.String;
-
-                    // Populate the building and room dropdowns
-                    fetchAndPopulateBuildings(data.site_id)
-                        .then(() => fetchAndPopulateRooms(data.building_id))
-                        .then(() => {
-                            // Set the building and room values
-                            document.getElementById("editBuildingInput").value =
-                                data.building_id;
-                            document.getElementById("editRoomInput").value =
-                                data.room_id;
-                        });
-
-                    // Check and update visibility of extinguisher fields
-                    updateExtinguisherFields();
-
-                    // Check if status is "Inspection Failed" or "Inspection Due" and disable the dropdown
-                    if (
-                        data.status.String === "Inspection Failed" ||
-                        data.status.String === "Inspection Due"
-                    ) {
-                        document.getElementById(
-                            "editStatusInput"
-                        ).disabled = true;
-
-                        if (data.status.String === "Inspection Failed") {
-                            var option = document.createElement("option");
-                            option.text = "Inspection Failed";
-                            option.value = "Inspection Failed";
-                            document
-                                .getElementById("editStatusInput")
-                                .add(option);
-                            document.getElementById("editStatusInput").value =
-                                "Inspection Failed";
-                        }
-
-                        if (data.status.String === "Inspection Due") {
-                            var option = document.createElement("option");
-                            option.text = "Inspection Due";
-                            option.value = "Inspection Due";
-                            document
-                                .getElementById("editStatusInput")
-                                .add(option);
-                            // Set the value of the dropdown to "Inspection Due"
-                            document.getElementById("editStatusInput").value =
-                                "Inspection Due";
-                        }
-                    } else {
-                        // If the status is not "Inspection Failed" or "Inspection Due", enable the dropdown
-                        document.getElementById(
-                            "editStatusInput"
-                        ).disabled = false;
-                    }
-
-                    // Now remove options that are not needed based on current status
-                    if (data.status.String !== "Inspection Failed") {
-                        // Remove the option from the dropdown where value = "Inspection Failed"
-                        let statusInput =
-                            document.getElementById("editStatusInput");
-                        for (let i = 0; i < statusInput.options.length; i++) {
-                            if (
-                                statusInput.options[i].value ===
-                                "Inspection Failed"
-                            ) {
-                                statusInput.remove(i);
-                                break; // Exit loop after removing the option
-                            }
-                        }
-                    }
-
-                    if (data.status.String !== "Inspection Due") {
-                        // Remove the option from the dropdown where value = "Inspection Due"
-                        let statusInput =
-                            document.getElementById("editStatusInput");
-                        for (let i = 0; i < statusInput.options.length; i++) {
-                            if (
-                                statusInput.options[i].value ===
-                                "Inspection Due"
-                            ) {
-                                statusInput.remove(i);
-                                break; // Exit loop after removing the option
-                            }
-                        }
-                    }
-
-                    $("#editOfferingModal").modal("show");
-                });
-        })
-        .catch((error) => {
-            console.error("Error loading dropdown data:", error);
-        });
-
-    document
-        .querySelector("#editEmergencyDeviceTypeInput")
-        .addEventListener("change", updateExtinguisherFields);
-
-    document
-        .querySelector("#editManufactureDateInput")
-}
-
-function fetchAndPopulateBuildings(siteId) {
-    return fetch(`/api/building?siteId=${siteId}`)
-        .then((response) => response.json())
-        .then((data) => {
-            const selects = document.querySelectorAll(
-                ".buildingInput, .editBuildingInput"
-            );
-            selects.forEach((select) => {
-                select.innerHTML =
-                    "<option value='' selected disabled>Select a Building</option>";
-                data.forEach((item) => {
-                    const option = document.createElement("option");
-                    option.text = item.building_code;
-                    option.value = item.building_id;
-                    select.add(option);
-                });
-
-                // If there's only one building, select it automatically
-                if (data.length === 1) {
-                    select.value = data[0].building_id;
-                    select.dispatchEvent(new Event("change"));
-                }
-            });
-            return data;
-        })
-        .catch((error) => console.error("Error:", error));
-}
-
-function fetchAndPopulateRooms(buildingId) {
-    return fetch(`/api/room?buildingId=${buildingId}`)
-        .then((response) => response.json())
-        .then((data) => {
-            const selects = document.querySelectorAll(
-                ".roomInput",
-                ".editRoomInput"
-            );
-            selects.forEach((select) => {
-                select.innerHTML =
-                    "<option value='' selected disabled>Select a Room</option>";
-                data.forEach((item) => {
-                    const option = document.createElement("option");
-                    option.text = item.room_code;
-                    option.value = item.room_id;
-                    select.add(option);
-                });
-            });
-            return data;
-        })
-        .catch((error) => console.error("Error:", error));
-}
-
-/// Fetch the form and the submit button
-const addOfferingForm = document.querySelector("#addOfferingForm");
-const addDeviceButton = document.querySelector("#addDeviceBtn");
-/// Fetch the form and the submit button
-const editOfferingForm = document.querySelector("#editOfferingForm");
-const editDeviceButton = document.querySelector("#editDeviceBtn");
-
-// Function to validate select elementsvalidateDateshandle
-function validateSelect(selectElement) {
-    if (selectElement.value === "") {
-        selectElement.setCustomValidity("Please make a selection");
-    } else {
-        selectElement.setCustomValidity("");
-    }
-}
-
-// Function to validate length for input and textarea elements
-function validateLength(element, maxLength) {
-    if (element.value.length > maxLength) {
-        element.setCustomValidity(
-            `This field is too long, maximum ${maxLength} characters.`
-        );
-    } else {
-        element.setCustomValidity("");
-    }
-}
-
-// Function to handle device type changes
-function handleDeviceTypeChange(event) {
-    const selectedOption = event.target.options[event.target.selectedIndex];
-    const selectedDeviceType = selectedOption.textContent;
-    const isEdit = event.target.id === "editEmergencyDeviceTypeInput";
-    const prefix = isEdit ? "edit" : "";
-
-    if (selectedDeviceType !== "Fire Extinguisher") {
-        // Clear and hide extinguisher type
-        const extinguisherTypeInput = document.querySelector(
-            `#${prefix}ExtinguisherTypeInput`
-        );
-
-        if (extinguisherTypeInput) {
-            extinguisherTypeInput.value = "";
-            document
-                .querySelector(`.${prefix}ExtinguisherTypeInputDiv`)
-                .classList.add("d-none");
-            document
-                .querySelector(`#${prefix}ExpireDateDiv`)
-                .classList.add("d-none");
-        }
-    } else {
-        // Show fields for Fire Extinguisher
-        document
-            .querySelector(`.${prefix}ExtinguisherTypeInputDiv`)
-            .classList.remove("d-none");
-
-        // Show expiry date field
-        document
-            .querySelector(`#${prefix}ExpireDateDiv`)
-            .classList.remove("d-none");
-    }
-}
-
-document.addEventListener("DOMContentLoaded", async function () {
-
-    // Add change event listeners to device type inputs
-    const deviceTypeInputs = document.querySelectorAll(
-        ".emergencyDeviceTypeInput"
-    );
-    deviceTypeInputs.forEach((input) => {
-        input.addEventListener("change", handleDeviceTypeChange);
-    });
-
-    const description = document.querySelector(".descriptionInput");
-    const editDescriptionInput = document.querySelector(
-        "#editDescriptionInput"
-    );
-
-    // Validate edit description length
-    editDescriptionInput.addEventListener("input", function () {
-        validateLength(this, 255);
-    });
-
-    // Validate description length
-    description.addEventListener("input", function () {
-        validateLength(this, 255);
-    });
-
-    // Add event listener for status validation
-    document.getElementById("status").addEventListener("change", function () {
-        validateAddStatus();
-    });
-
-    // Add event listeners to select elements
-    document
-        .querySelectorAll(
-            ".emergencyDeviceTypeInput, .siteInput, .buildingInput, .roomInput"
-        )
-        .forEach((select) => {
-            select.addEventListener("change", function () {
-                validateSelect(this);
-            });
-        });
-
-    // Add event listener for status validation
-    // Check if device status is "Expired" then check that the expire date is in the past
-    document
-        .getElementById("editStatusInput")
-        .addEventListener("change", validateEditStatus);
-
-    function validateEditStatus() {
-        const statusInput = document.getElementById("editStatusInput");
-        const statusFeedback = document.getElementById("editStatusFeedback");
-        const manufactureDateInput = document.getElementById(
-            "editManufactureDateInput"
-        );
-
-        const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
-
-        const deviceType = document.getElementById(
-            "editEmergencyDeviceTypeInput"
-        );
-        const selectedText =
-            deviceType?.options[deviceType.selectedIndex]?.text || "";
-
-        if (statusInput.value === "Expired") {
-            const manufactureDateValue = manufactureDateInput.value;
-            const invalidDate = "0001-01-01"; // Invalid date for manufacture date
-
-            // Only if device type is Fire Extinguisher
-            if (selectedText.toLowerCase().includes("fire extinguisher")) {
-                if (
-                    manufactureDateValue === "" ||
-                    manufactureDateValue.startsWith(invalidDate)
-                ) {
-                    statusInput.setCustomValidity(
-                        "Please enter a valid manufacture date before setting status to 'Expired'"
-                    );
-                    statusFeedback.textContent =
-                        "Please enter a valid manufacture date before setting status to 'Expired'";
-                    manufactureDateInput.setCustomValidity(
-                        "Please enter a valid manufacture date before setting status to 'Expired'"
-                    );
-                    document.getElementById(
-                        "editManufactureDateFeedback"
-                    ).textContent =
-                        "Please enter a valid manufacture date before setting status to 'Expired'";
-                    return false;
-                }
-
-                const manufactureDate = new Date(manufactureDateValue);
-                const expireDate = new Date(manufactureDate);
-                expireDate.setFullYear(expireDate.getFullYear() + 5);
-
-                if (expireDate > currentDate) {
-                    statusInput.setCustomValidity(
-                        "Device status is 'Expired' but the expire date is in the future."
-                    );
-                    statusFeedback.textContent =
-                        "Device status is 'Expired' but the expire date is in the future.";
-                    manufactureDateInput.setCustomValidity(
-                        "Manufacture date cannot be within the past 5 years if status is 'Expired'"
-                    );
-                    document.getElementById(
-                        "editManufactureDateFeedback"
-                    ).textContent =
-                        "Manufacture date cannot be within the past 5 years if status is 'Expired'";
-                    return false;
-                }
-            }
-        } else if (statusInput.value === "Active") {
-            if (
-                selectedText.toLowerCase().includes("fire extinguisher") &&
-                manufactureDateInput.value !== ""
-            ) {
-                const manufactureDate = new Date(manufactureDateInput.value);
-                const expireDate = new Date(manufactureDate);
-                expireDate.setFullYear(expireDate.getFullYear() + 5);
-
-                if (expireDate <= currentDate) {
-                    statusInput.setCustomValidity(
-                        "Device status cannot be set to 'Active' if it has expired."
-                    );
-                    statusFeedback.textContent =
-                        "Device status cannot be set to 'Active' if it has expired.";
-                    return false;
-                }
-            }
-        }
-
-        statusInput.setCustomValidity("");
-        statusFeedback.textContent = "";
-        manufactureDateInput.setCustomValidity("");
-        document.getElementById("editManufactureDateFeedback").textContent = "";
-        return true;
-    }
-
-    function validateAddStatus() {
-        const statusInput = document.getElementById("status");
-        const statusFeedback = document.getElementById("statusFeedback");
-        const manufactureDateInput = document.getElementById("manufactureDate");
-
-        const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
-
-        const deviceType = document.getElementById("EmergencyDeviceTypeInput");
-        const selectedText =
-            deviceType?.options[deviceType.selectedIndex]?.text || "";
-
-        if (statusInput.value === "Expired") {
-            const manufactureDateValue = manufactureDateInput.value;
-            const invalidDate = "0001-01-01";
-
-            if (selectedText.toLowerCase().includes("fire extinguisher")) {
-                if (
-                    manufactureDateValue === "" ||
-                    manufactureDateValue.startsWith(invalidDate)
-                ) {
-                    statusInput.setCustomValidity(
-                        "Please enter a valid manufacture date before setting status to 'Expired'"
-                    );
-                    statusFeedback.textContent =
-                        "Please enter a valid manufacture date before setting status to 'Expired'";
-                    manufactureDateInput.setCustomValidity(
-                        "Please enter a valid manufacture date before setting status to 'Expired'"
-                    );
-                    document.getElementById(
-                        "addManufactureDateFeedback"
-                    ).textContent =
-                        "Please enter a valid manufacture date before setting status to 'Expired'";
-                    return false;
-                }
-
-                const manufactureDate = new Date(manufactureDateValue);
-                const expireDate = new Date(manufactureDate);
-                expireDate.setFullYear(expireDate.getFullYear() + 5);
-
-                if (expireDate > currentDate) {
-                    statusInput.setCustomValidity(
-                        "Device status is 'Expired' but the expire date is in the future."
-                    );
-                    statusFeedback.textContent =
-                        "Device status is 'Expired' but the expire date is in the future.";
-                    manufactureDateInput.setCustomValidity(
-                        "Manufacture date cannot be within the past 5 years if status is 'Expired'"
-                    );
-                    document.getElementById(
-                        "addManufactureDateFeedback"
-                    ).textContent =
-                        "Manufacture date cannot be within the past 5 years if status is 'Expired'";
-                    return false;
-                }
-            }
-        } else if (statusInput.value === "Active") {
-            if (
-                selectedText.toLowerCase().includes("fire extinguisher") &&
-                manufactureDateInput.value !== ""
-            ) {
-                const manufactureDate = new Date(manufactureDateInput.value);
-                const expireDate = new Date(manufactureDate);
-                expireDate.setFullYear(expireDate.getFullYear() + 5);
-
-                if (expireDate <= currentDate) {
-                    statusInput.setCustomValidity(
-                        "Device status cannot be set to 'Active' if it has expired."
-                    );
-                    statusFeedback.textContent =
-                        "Device status cannot be set to 'Active' if it has expired.";
-                    return false;
-                }
-            }
-        }
-
-        statusInput.setCustomValidity("");
-        statusFeedback.textContent = "";
-        manufactureDateInput.setCustomValidity("");
-        document.getElementById("addManufactureDateFeedback").textContent = "";
-        return true;
-    }
-
-    // Add event listener to the add device button
-    addDeviceButton.addEventListener("click", async function (event) {
-        // Validate all select elements before form submission
-        document
-            .querySelectorAll(
-                ".emergencyDeviceTypeInput, .siteInput, .buildingInput, .roomInput"
-            )
-            .forEach((select) => {
-                validateSelect(select);
-            });
-
-        // Validate description length
-        validateLength(description, 255);
-
-        // Validate status
-        const statusValid = validateAddStatus();
-
-        if (!addOfferingForm.checkValidity() || !statusValid) {
-            event.preventDefault();
-            event.stopPropagation();
-        } else {
-            try {
-                sessionStorage.setItem("shouldRefreshNotifications", "true");
-                await addOfferingForm.submit(); // Submit form
-            } catch (error) {
-                console.error("Error during form submission:", error);
-            }
-        }
-
-        addOfferingForm.classList.add("was-validated");
-    });
-
-    // Add event listener to the edit device button
-    editDeviceButton.addEventListener("click", async function (event) {
-        event.preventDefault(); // Prevent default form submission
-
-        // Validate all select elements before form submission
-        document
-            .querySelectorAll(
-                ".emergencyDeviceTypeInput, .editSiteInput, .editBuildingInput, .roomInput"
-            )
-            .forEach((select) => {
-                validateSelect(select);
-            });
-
-        // Validate description length
-        validateLength(description, 255);
-
-        // Validate status
-        const statusValid = validateEditStatus();
-
-        // Check if the form is valid
-        if (!editOfferingForm.checkValidity() || !statusValid) {
-            event.stopPropagation();
-            editOfferingForm.classList.add("was-validated");
-        } else {
-            if (document.getElementById("editStatusInput").disabled) {
-                document.getElementById("editStatusInput").disabled = false; // Temporarily enable
-            }
-
-            // If the form is valid, prepare to send the PUT request
-            const formData = new FormData(editOfferingForm);
-            const jsonData = Object.fromEntries(formData.entries());
-
-            try {
-                // Send the PUT request
-                const response = await fetch(
-                    `/api/emergency-device/${
-                        document.getElementById("editDeviceID").value
-                    }`,
-                    {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(jsonData),
-                    }
-                );
-                const data = await response.json();
-
-                if (data.error) {
-                    window.location.href = data.redirectURL;
-                } else if (data.message) {
-                    // Refresh the notifications and then redirect
-                    sessionStorage.setItem(
-                        "shouldRefreshNotifications",
-                        "true"
-                    );
-                    window.location.href = data.redirectURL;
-                } else {
-                    console.error("Unexpected response:", data);
-                    throw new Error("Unexpected response");
-                }
-            } catch (error) {
-                console.error("Fetch error:", error);
-            }
-        }
-    });
-});
-
-export function deviceNotes(description) {
-    // Populate the modal with the description
-    document.getElementById("notesModalBody").innerText = description;
-
-    // Show the modal
-    $("#notesModal").modal("show");
-}
-
-
-document.getElementById("searchInput").addEventListener("input", () => {
-    searchDevices();
-});
-
-// Updated search function to use combined filtering approach
-export async function searchDevices() {
-    const searchInput = document.getElementById("searchInput");
-    const searchValue = searchInput.value.toLowerCase();
-
-    // First, reapply base filters to get fresh filtered state
-    // Start with all devices
-    let baseFilteredDevices = [...allOfferings];
-
-    // Apply active filters to get our base filtered state
-    if (activeFilters.room && activeFilters.room !== "All Rooms") {
-        baseFilteredDevices = baseFilteredDevices.filter(
-            (device) => device.room_code === activeFilters.room
-        );
-    }
-
-    if (
-        activeFilters.deviceType &&
-        activeFilters.deviceType !== "Device Type" &&
-        activeFilters.deviceType !== "All Device Types"
-    ) {
-        baseFilteredDevices = baseFilteredDevices.filter(
-            (device) =>
-                device.emergency_device_type_name === activeFilters.deviceType
-        );
-    }
-
-    if (
-        activeFilters.status &&
-        activeFilters.status !== "Status" &&
-        activeFilters.status !== "All Statuses"
-    ) {
-        baseFilteredDevices = baseFilteredDevices.filter(
-            (device) => device.status.String === activeFilters.status
-        );
-    }
-
-    // If search is empty, use just the filtered results
-    if (!searchValue) {
-        filteredDevices = baseFilteredDevices;
-    } else {
-        // Apply search filter to the fresh filtered state
-        filteredDevices = baseFilteredDevices.filter((device) => {
-            const baseSearch =
-                device.emergency_device_type_name
-                    .toLowerCase()
-                    .includes(searchValue) ||
-                device.extinguisher_type_name.String.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.room_code.toLowerCase().includes(searchValue) ||
-                device.serial_number.String.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.manufacture_date.Time.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.expire_date.Time.toLowerCase().includes(searchValue) ||
-                device.size.String.toLowerCase().includes(searchValue) ||
-                device.status.String.toLowerCase().includes(searchValue) ||
-                device.description.String.toLowerCase().includes(searchValue);
-
-            // Add admin-only fields if user is admin
-            if (role === "Admin") {
-                const lastInspectionFormatted = new Date(
-                    device.last_inspection_datetime.Time
-                )
-                    .toLocaleDateString("en-NZ", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                    })
-                    .toLowerCase();
-
-                const nextInspectionFormatted = new Date(
-                    device.next_inspection_date.Time
-                )
-                    .toLocaleDateString("en-NZ", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                    })
-                    .toLowerCase();
-
-                return (
-                    baseSearch ||
-                    lastInspectionFormatted.includes(searchValue) ||
-                    nextInspectionFormatted.includes(searchValue)
-                );
-            }
-
-            return baseSearch;
-        });
-    }
-
-    updateTable();
-}
-
-// Function to limit the date input to yesterday's date
-$(function () {
-    var dtToday = new Date();
-
-    // Subtract one day to get yesterday's date
-    dtToday.setDate(dtToday.getDate() - 1);
-
-    var month = dtToday.getMonth() + 1;
-    var day = dtToday.getDate();
-    var year = dtToday.getFullYear();
-
-    // Pad month and day with leading zeros if necessary
-    if (month < 10) month = "0" + month.toString();
-    if (day < 10) day = "0" + day.toString();
-
-    var maxDate = year + "-" + month + "-" + day;
-
-    // Set max attribute for the date inputs
-    $("#editManufactureDateInput").attr("max", maxDate);
-    $("#manufactureDate").attr("max", maxDate);
-});
-
 // Make functions available globally
 window.clearFilters = clearFilters;
-window.addOffering = addOffering;
-window.editOffering = editOffering;
-window.offeringNotes = offeringNotes;
+
