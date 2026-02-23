@@ -53,6 +53,15 @@ Exam progression ready->active->expired|closed->marked
 
 Course code, description, examid, yr, semester, ready, active, expired, closed, marked
 
+### timed events
+https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval 
+<script>
+    function autoRefresh() {
+        window.location = window.location.href;
+    }
+    setInterval('autoRefresh()', 5000);
+</script>
+
 ## ADS4/internal/app
 
 Basic database Model

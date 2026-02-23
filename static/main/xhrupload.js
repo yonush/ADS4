@@ -1,4 +1,5 @@
 // file upload script - adpated from https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequestUpload
+//replce with fetch api https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 /* TODO: replace the XMLHttpRequest with the fetch api
 //syntax with authentication
 fetch("url", {
