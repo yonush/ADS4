@@ -1,11 +1,12 @@
 # ADS4 Todo & summary of changes
 
-- Consider upgrading from Echo v4 to Echo v5.
-- Consider using templ for embedding the templates 
+- Upgrade from Echo v4 to Echo v5.
+- Use templ and go fs for embedding the templates 
 - Include CORS and CSRF protections
   
-- change main page to include basic metrics without logging into the system
-- improve the imported to include feedback  
+- update the dashboard with the metrics query
+- replace the XMLHTTP API with the more modern fetch - refer to static/main/xhrupload.js
+  - https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
 - https://www.sqlite.org/pragma.html#pragma_synchronous
 - https://github.com/mattn/go-sqlite3?tab=readme-ov-file
@@ -13,8 +14,8 @@
 - https://docs.gofiber.io/template/html_v2.x.x/html/TEMPLATES_CHEATSHEET/
 - https://gowebly.org/
 
-- need to add a filter based on the semster poeriod. In other words the dashboard on shows the current exams based on S1-S3 and year
-- admin.html -> fix/remove the following as this si a security risk
+- Update filter based on the semster period. In other words the dashboard only shows the current exams based on S1-S3 and year
+- admin.html -> fix/remove the following as this is a security risk
           <script>
             var role = "{{.role}}";
             var current_user_id = "{{.user_id}}";
@@ -22,23 +23,15 @@
             var is_current_user_default_admin = "{{.default_admin}}";
         </script>
 
-**LOC counter**
-Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
-
-## TODO
-
-- fix main.js - logout and other functions not working on the admin page
-- add data importers under the admin area for the courses, learners, offerings and learner exams
-  - check if it is the correct file - contains header with correct fields
-  - check field count
+- Update importers to include:
+  - check if it is the correct file - contains header with correct fields and field count
   - check field types and structure
   - generate calculated data items - e.g examid
   - generate exception report
 
-- use for dateime handling https://www.digitalocean.com/community/tutorials/how-to-use-dates-and-times-in-go
-- update the /dashboard page content  
+- use for datetime handling https://www.digitalocean.com/community/tutorials/how-to-use-dates-and-times-in-go
 
-- consider timestamping the actual questions in the assessment tool
+- Timestamp the actual questions in the assessment tool
   
 - Template with templ - https://github.com/a-h/templ
 - HTMX for SSE with go-HTMX & HTMX - https://github.com/donseba/go-htmx, https://htmx.org/   
@@ -48,6 +41,11 @@ Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
   - https://eli.thegreenplace.net/2024/gemma-ollama-and-langchaingo/
   - https://github.com/eliben/code-for-blog/tree/main/2023/ollama-go-langchain
     - C:\devwork\code-for-blog\2023
+
+### other
+
+**LOC counter**
+Get-ChildItem -recurse *.go |Get-Content | Measure-Object -line
 
 ### dashboard metrics
 
@@ -110,5 +108,3 @@ app/routes.go - update these to reflect the new routes
 - udpate notifications.js with new notification handlers
 - remove inspections.js
 - keep main.js
-
-

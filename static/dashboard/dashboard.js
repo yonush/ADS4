@@ -214,7 +214,7 @@ async function loadOfferingsAndUpdateTable(semester="") {
     if (offerings.length === 0) {
         const tbody = document.getElementById("exam-offering-body");
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="12" class="text-center">No devices found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="12" class="text-center">No exam offerings found.</td></tr>`;
         }
     }
 }
@@ -232,7 +232,7 @@ function updateTable() {
 
     // Clear table if no devices
     if (!Array.isArray(pageOfferings) || pageOfferings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" class="text-center">No devices found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center">No exam offerings found.</td></tr>`;
     } else {
         tbody.innerHTML = pageOfferings.map(formatOfferingRow).join("");
     }
