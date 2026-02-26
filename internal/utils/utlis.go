@@ -70,10 +70,9 @@ func GetLocalIP() net.IP {
 func IsValidExamCode(code string) bool {
 	//validate the examid
 	//2026S1ITCS5.100
-	yr := code[:3]         //year component
-	sem := code[4:5]       //semester component
+	yr := code[:4]         //year component
+	sem := code[4:6]       //semester component
 	coursecode := code[6:] //	coursecode component
-
 	//e.g 2026
 	y, err := strconv.Atoi(yr)
 	if err != nil || len(yr) != 4 || y < time.Now().Year() {

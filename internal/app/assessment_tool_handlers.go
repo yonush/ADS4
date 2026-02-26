@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -42,8 +43,10 @@ func (a *App) HandlePostExamUpload(c echo.Context) error {
 			"error": "Method not allowed",
 		})
 	}
+
+	//TODO add validate for the following
 	password := c.Param("password")
-	examid := c.Param("examid")
+	examid := c.Param("examid") //refer to offering_handlers.go for validator
 	studentid := c.Param("studentid")
 
 	//TODO do a time check to set the exam state to expired if the learner does not save within the time
@@ -74,8 +77,49 @@ func (a *App) HandlePostExamUpload(c echo.Context) error {
 	}
 	defer src.Close()
 
+	//check target folder - create the folders if they dont exist
+	// we assume the examid is valid at this stage
+	//2026S1ITCS5.100
+	Y := examid[:4]  //year component
+	S := examid[4:6] //semester component
+	C := examid[6:]  //	coursecode component
+
+	//build the target folder for the exam
+	//      [basedir]     [Y]  [S]  [C]
+	// e.g. ./data/learners/2026/S1/ITCS5.100
+	basedir := a.DataDir + "/learners/"
+	//create the YEAR folder if it does not exist
+	target := basedir + Y
+	err = os.Mkdir(target, 0755) //RWX,R_X,R_X OGO
+	if errors.Is(err, os.ErrNotExist) {
+		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to create the exam folder: " + target})
+	}
+
+	//create the SEMESTER folder if it does not exist
+	target = basedir + Y + "/" + S
+	err = os.Mkdir(target, 0755) //RWX,R_X,R_X OGO
+	if errors.Is(err, os.ErrNotExist) {
+		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to create the exam folder: " + target})
+	}
+
+	//create the COURSECODE folder if it does not exist
+	target = basedir + Y + "/" + S + "/" + C
+	err = os.Mkdir(target, 0755) //RWX,R_X,R_X OGO
+	if errors.Is(err, os.ErrNotExist) {
+		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to create the exam folder: " + target})
+	}
+
+	//if the is an error the folder could already exist
+	if errors.Is(err, os.ErrNotExist) {
+		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to create the exam folder: " + target})
+	}
+
+	//time.Sleep(time.Millisecond * 100) //give the OS 100ms to settle before testing the folder
+
 	//copy and save the exam file
-	filepath := a.DataDir + "/learners/" + examfile.Filename
+	//     					[basedir] + [Y] + [S] + [C]
+	//e.g. where target is data/learners/2026/S1/ITCS5.100
+	filepath := target + "/" + examfile.Filename
 	dst, err := os.Create(filepath)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{"Status": "Error", "Message": "Unable to create the destination exam file"})

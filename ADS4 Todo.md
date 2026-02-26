@@ -5,7 +5,6 @@
 - Use templ and go fs for embedding the templates 
 - Include CORS and CSRF protections
   
-- update the dashboard with the metrics query
 - replace the XMLHTTP API with the more modern fetch - refer to static/main/xhrupload.js
   - https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
