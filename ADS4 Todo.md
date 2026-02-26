@@ -1,6 +1,7 @@
 # ADS4 Todo & summary of changes
 
-- Upgrade from Echo v4 to Echo v5.
+- Upgrade from Echo v4 to Echo v5. v4 safe until 31 Dec 2026 
+  - https://github.com/labstack/echo/blob/master/API_CHANGES_V5.md
 - Use templ and go fs for embedding the templates 
 - Include CORS and CSRF protections
   
@@ -28,7 +29,9 @@
   - check field types and structure
   - generate calculated data items - e.g examid
   - generate exception report
-
+- create general search query
+  - groupby/filterby by field (examid, studentid, course) then value. e.g route /groupby/:field/:value
+  
 - use for datetime handling https://www.digitalocean.com/community/tutorials/how-to-use-dates-and-times-in-go
 
 - Timestamp the actual questions in the assessment tool

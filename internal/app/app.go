@@ -61,6 +61,7 @@ func NewApp(cfg config.Config) *App {
 	router.Use(middleware.RequestLogger()) // Log requests
 	router.Use(middleware.Recover())       // Recover from panics
 	router.Use(middleware.CORS())          // Enable CORS
+	router.Use(middleware.AddTrailingSlash())
 	//router.Use(utils.LoggingMiddleware)
 
 	// Initialize Database

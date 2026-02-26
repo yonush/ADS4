@@ -14,27 +14,6 @@ import (
 //----------------------------------------------------------------------------------------------------------
 // The handler below are used by the Z2A Assessment tool
 
-// HandleGetAllOfferings fetches a curated list of all active exams from the database and returns the results as JSON
-// list includes the course description from a join with the courses table
-func (a *App) HandleGetYearList(c echo.Context) error {
-	// Check if request if a GET request
-	if c.Request().Method != http.MethodGet {
-		return c.Redirect(http.StatusSeeOther, "/dashboard?error=Method not allowed")
-	}
-
-	//retrieve the list of years in the database
-	examYears, err := a.DB.GetExamYears()
-	if err != nil {
-		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
-	}
-
-	// Return the results as JSON
-	return c.JSON(http.StatusOK, examYears)
-	
-}
-
-// HandleGetAllOfferings fetches a curated list of all active exams from the database and returns the results as JSON
-// list includes the course description from a join with the courses table
 func (a *App) HandleGetExamList(c echo.Context) error {
 	// Check if request if a GET request
 	if c.Request().Method != http.MethodGet {

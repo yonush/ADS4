@@ -83,7 +83,7 @@ CREATE TABLE "UserT" (
     CHECK (Role IN ('Admin','Faculty','Learner'))
 );
 
--- View to determine the curernt state of the exam sessions - past and present
+-- View to determine the current state of the exam sessions - past and present
 -- used for the dashboard
 CREATE VIEW examMetrics AS
 SELECT c.CourseCode, c.Description, o.Password, 
@@ -97,9 +97,24 @@ SELECT c.CourseCode, c.Description, o.Password,
 FROM courses c, offerings o, Learnerexams l
 WHERE c.CourseCode = o.CourseCode 
 	  AND o.ExamID = l.ExamID  
+      AND o.status = 'active'
 GROUP BY c.CourseCode, o.year
 ORDER by o.year DESC;
 
+-- View to determine the learners exam state from the exam sessions 
+CREATE VIEW ClosedExams AS
+SELECT l.StudentID, s.name, l.ExamID, o.CourseCode, 
+       o.Year, o.Semester, l.Grade   
+FROM offerings o, Learnerexams l, Learners s
+WHERE o.ExamID = l.ExamID AND l.StudentID = s.StudentID   
+      AND l.status = 'closed';
+
+CREATE VIEW MarkedExams AS
+SELECT l.StudentID, s.name, l.ExamID, o.CourseCode, 
+       o.Year, o.Semester, l.Grade   
+FROM offerings o, Learnerexams l, Learners s
+WHERE o.ExamID = l.ExamID AND l.StudentID = s.StudentID 
+      AND l.status = 'marked';
 
 -- +goose StatementEnd
 
@@ -108,6 +123,7 @@ ORDER by o.year DESC;
 
 -- Drop tables in reverse order of creation to avoid foreign key constraint violations
 DROP VIEW IF EXISTS "examMetrics";
+DROP VIEW IF EXISTS "ClosedExams";
 DROP TABLE IF EXISTS "Learnerexams";
 DROP TABLE IF EXISTS "Learners";
 DROP TABLE IF EXISTS "Offerings";

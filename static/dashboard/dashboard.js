@@ -1,5 +1,20 @@
 // dashboard.js
 
+// Initialize the map and populate filter options
+getFilterOptions();
+
+let currentPage = 1;
+let rowsPerPage = 10;
+let allOfferings = [];
+let filteredOfferings = [];
+
+// Keep track of active filters
+let activeFilters = {
+    year: null,
+    semester: null,
+    status: null,
+};
+
 //-----------------------------------------------------------------------------------------------------------
 //filtering controls
 export function clearFilters() {
@@ -7,7 +22,7 @@ export function clearFilters() {
     document.getElementById("yearFilter").selectedIndex = 0;
     document.getElementById("semesterFilter").selectedIndex = 0;
     document.getElementById("searchInput").value = ""; // Clear search input
-
+ 
     // Reset active filters
     activeFilters = {
         year: null,
@@ -17,7 +32,7 @@ export function clearFilters() {
 
     filteredOfferings = [...allOfferings]; // Reset to original devices
     clearTableBody();
-    loadOfferingsAndUpdateTable();
+    loadOfferingsAndUpdateTable("","");
 }
 
 function getFilterOptions() {
@@ -26,8 +41,8 @@ function getFilterOptions() {
     fetchAndPopulateSelect(
         "/yearlist",
         "yearFilter",
-        "year",
-        "year",
+        "Year",
+        "Year",
         "Current Year"
     );
     setupSemesterFilter();
@@ -86,9 +101,8 @@ function setupSemesterFilter() {
 //TODO fix this filter
 function filterBySemester(semester) {
     const semesterFilter = document.getElementById("semesterFilter");
-
     if (semester) {
-        // Loop through `semesterFilter` options to select the one with matching text
+        // Loop through `buildingFilter` options to select the one with matching text
         for (const option of semesterFilter.options) {
             if (option.text === semester) {
                 option.selected = true;
@@ -97,13 +111,16 @@ function filterBySemester(semester) {
         }
     } else {
         semester = semesterFilter.selectedOptions[0].text;
+        year = document.getElementById("yearFilter").value;
+        //year = activeFilters.year
+         //activeFilters.semester = semester
+
     }
 
-    // Fetch devices based on `buildingCode` and `siteId`
     if (semester === "All Semesters" || semesterFilter.value === "") {
-        loadOfferingsAndUpdateTable("");
+        loadOfferingsAndUpdateTable(year,"");
     } else {
-        loadOfferingsAndUpdateTable(semester);
+        loadOfferingsAndUpdateTable(year ,semester);
     }
 }
 
@@ -115,32 +132,29 @@ function setupYearFilter() {
     });
 }
 
-function filterByYear() {
-    const selectedYear = document.getElementById("yearFilter").value;
-
-    if (selectedYear != "All Years") {        
-        //TODO add route for years
-        if (selectedYear == 'Current Year') {
-            selectedYear = new Date().getFullYear()  // returns the current year
+function filterByYear(year) {
+    const yearFilter = document.getElementById("yearFilter").value;
+ 
+    if (year) {
+        // Loop through `buildingFilter` options to select the one with matching text
+        for (const option of yearFilter.options) {
+            if (option.text === semester) {
+                option.selected = true;
+                break;
+            }
         }
-        fetch(`/api/offerings?year=${selectedYear}`)
-            .then((response) => response.json())
-            .then((data) => {
-                const yearSelect = document.getElementById("yearFilter");
-                yearSelect.innerHTML = "";
+    } else {
+        year = yearFilter.selectedOptions[0].text;
+        semester = document.getElementById("yearFilter").value;
+        //semester = activeFilters.semester
+        //activeFilters.year = year
+    }
 
-                // Add default "Curernt Year" option
-                addDefaultOption(yearSelect, "Current Year");
 
-                // Add room options
-                data.forEach((room) => {
-                    const option = document.createElement("option");
-                    option.value = year.year // Store the ID as the value
-                    option.text = room.year; // Show the code as the text
-                    yearSelect.add(option);
-                });
-            });
-        return;
+    if (year === "Current Year" || yearFilter.value === "") {
+        loadOfferingsAndUpdateTable("",semester);
+    } else {
+        loadOfferingsAndUpdateTable(year,semester);
     }
 }
 
@@ -153,19 +167,7 @@ function clearTableBody() {
     }
 }
 
-// Initialize the map and populate filter options
-getFilterOptions();
 
-let currentPage = 1;
-let rowsPerPage = 10;
-let allOfferings = [];
-let filteredOfferings = [];
-
-// Keep track of active filters
-let activeFilters = {
-    year: null,
-    semester: null,
-};
 
 // Add event listeners for the new filters
 document.getElementById("yearFilter").addEventListener("change", () => {
@@ -180,16 +182,13 @@ document.getElementById("semesterFilter").addEventListener("change", () => {
     updateTable();
 });
 
-
-
-
-async function getAllExamOfferings(semester = "") {
+async function getAllExamOfferings(year="",semester = "") {
     try {
-        let url = "/offerings";
+        let url = "/exammetrics";
         const params = new URLSearchParams();
         if (semester) params.append("semester", semester);
+        if (year) params.append("year", year);
         if (params.toString()) url += `?${params.toString()}`;
-
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -197,6 +196,7 @@ async function getAllExamOfferings(semester = "") {
         }
 
         const offerings = await response.json();
+        //console.error(offerings)
         return offerings; // Return the devices instead of storing in global variable
     } catch (err) {
         console.error("Failed to fetch offerings:", err);
@@ -204,10 +204,16 @@ async function getAllExamOfferings(semester = "") {
     }
 }
 
-async function loadOfferingsAndUpdateTable(semester="") {
-    const offerings = await getAllExamOfferings(semester);
+export async function filteredTable() {
+    console.log("> Y: "+activeFilters.year+" S: "+activeFilters.semester)
+    getAllExamOfferings(activeFilters.year,activeFilters.semester)
+}
+
+async function loadOfferingsAndUpdateTable(year="",semester="") {
+    
+    const offerings = await getAllExamOfferings(year,semester);
     allOfferings = offerings; // Update global variable if needed
-    filteredOfferings = offerings; // Initialize filtered devices
+    filteredOfferings = offerings; // Initialize filtered offerings
 
     updateTable();
 
@@ -230,13 +236,12 @@ function updateTable() {
     const endIndex = startIndex + rowsPerPage;
     const pageOfferings = filteredOfferings.slice(startIndex, endIndex);
 
-    // Clear table if no devices
+    // Clear table if no exam offerings
     if (!Array.isArray(pageOfferings) || pageOfferings.length === 0) {
         tbody.innerHTML = `<tr><td colspan="12" class="text-center">No exam offerings found.</td></tr>`;
     } else {
         tbody.innerHTML = pageOfferings.map(formatOfferingRow).join("");
     }
-
     updatePaginationControls(); 
 }
 
@@ -251,10 +256,7 @@ function filterTableByYear() {
     } else {
         // Try matching against both the value and text of the selected room
         filteredOfferings = allOfferings.filter(
-            //TODO: fix the year filter
-            (device) =>
-                device.room_code === selectedYearText ||
-                device.room_id === selectedYear
+            (offering) => offering.year === selectedYear
         );
     }
     activeFilters.year = selectedYearText;
@@ -270,7 +272,7 @@ function filterTableBySemester() {
     } else {
         filteredOfferings = allOfferings.filter(
             //TODO: fix the semester filter
-            (device) => device.emergency_device_type_name === selectedSemester
+            (offering) => offering.semester === selectedSemester
         );
     }
     activeFilters.semester = selectedSemester;
@@ -283,27 +285,25 @@ function applyFilters() {
     // Start with all offerings
     filteredOfferings = [...allOfferings];
 
+
     // Apply year filter if active
     if (activeFilters.year && 
-        activeFilters.year !== "Current year`" && 
-        activeFilters.year !== "All Years`"
+        activeFilters.year !== "Current Year" 
     ) {
         filteredOfferings = filteredOfferings.filter(
-            //TODO fix the filter application
-            (device) => device.room_code === activeFilters.year
+            (offering) => offering.year === activeFilters.year
         );
     }
 
     // Apply semester filter if active
     if (
         activeFilters.semester &&
-        activeFilters.semester !== "Semester" &&
-        activeFilters.semester !== "All Semesters"
+        activeFilters.semester !== "All Semesters" 
     ) {
         filteredOfferings = filteredOfferings.filter(
             //TODO fix the filter application
-            (device) =>
-                device.emergency_device_type_name === activeFilters.semester
+            (offering) =>
+                offering.semester === activeFilters.semester
         );
     }
     updateTable();
@@ -312,32 +312,11 @@ function applyFilters() {
 
 
 // Initial fetch without filtering
-loadOfferingsAndUpdateTable();
-/*
-<tr>
-    <th>Course Code ▲</th>
-    <th>Description ▲</th>
-    <th>Exam ID ▲</th>
-    <th>Password ▲</th>
-    <th>Ready ▲</th>
-    <th>Active ▲</th>
-    <th>Expired ▲</th>
-    <th>Closed ▲</th>
-    <th>Actions</th>
-</tr>
-*/
+loadOfferingsAndUpdateTable(activeFilters.year,activeFilters.semester);
+
 //TODO update to show the offerings
 function formatOfferingRow(offering) {
-    if (!device) return "";
-    const formatDateMonthYear = (dateString) =>
-        formatDate(dateString, { month: "short", year: "numeric" });
-    const formatDateFull = (dateString) =>
-        formatDate(dateString, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            timeZone: "Pacific/Auckland",
-        });
+    if (!offering) return "";
 
     const buttons = getActionButtons(offering);
 
@@ -349,38 +328,23 @@ function formatOfferingRow(offering) {
         isAdmin = true;
     }
 
+    //CourseCode,Description, Password, ExamID, Year, Semester,Ready, Active, Expired, Closed
+
     return `
         <tr>
-            <td data-label="Device Type">${
-                device.emergency_device_type_name
+            <td data-label="Course">${
+                offering.coursecode
             }</td>
-            <td data-label="Extinguisher Type">${
-                device.extinguisher_type_name.String
+            <td data-label="Description">${
+                offering.description
             }</td>
-            <td data-label="Building">${device.building_code}</td>
-            <td data-label="Room">${device.room_code}</td>
-            <td data-label="Serial Number">${device.serial_number.String}</td>
-            <td data-label="Manufacture Date">${formatDateMonthYear(
-                device.manufacture_date.Time
-            )}</td>
-            <td data-label="Expire Date">${formatDateMonthYear(
-                device.expire_date.Time
-            )}</td>
-            ${
-                isAdmin
-                    ? `<td data-label="Last Inspection Date">${formatDateFull(
-                          device.last_inspection_datetime.Time
-                      )}</td>`
-                    : ""
-            }
-            ${
-                isAdmin
-                    ? `<td data-label="Next Inspection Date">${formatDateFull(
-                          device.next_inspection_date.Time
-                      )}</td>`
-                    : ""
-            }
-            <td data-label="Size">${device.size.String}</td>
+            <td data-label="Exam ID">${offering.examid}</td>
+            <td data-label="Password">${offering.password}</td>
+
+            <td data-label="Ready">${offering.ready}</td>
+            <td data-label="Active">${offering.active}</td>
+            <td data-label="Expired">${offering.expired}</td>
+            <td data-label="Closed">${offering.closed}</td>
 
             <td>
                 <div class="btn-group">
@@ -389,16 +353,6 @@ function formatOfferingRow(offering) {
             </td>
         </tr>
     `;
-}
-
-function formatDate(dateString, options) {
-    if (!dateString || dateString === "0001-01-01T00:00:00Z") {
-        return "N/A";
-    }
-    return new Date(dateString).toLocaleString("en-NZ", {
-        timeZone: "Pacific/Auckland", // Ensure the correct timezone
-        ...options,
-    });
 }
 
 export function getActionButtons(offering) {
@@ -444,111 +398,6 @@ export function getActionButtons(offering) {
         `;
     }
     return buttons;
-}
-
-
-
-document.getElementById("searchInput").addEventListener("input", () => {
-    searchOfferings();
-});
-
-// Updated search function to use combined filtering approach
-//TODO update the search to look for offerings
-export async function searchOfferings() {
-    const searchInput = document.getElementById("searchInput");
-    const searchValue = searchInput.value.toLowerCase();
-
-    // First, reapply base filters to get fresh filtered state
-    // Start with all devices
-    let basefilteredOfferings = [...allOfferings];
-
-    // Apply active filters to get our base filtered state
-    if (activeFilters.room && activeFilters.room !== "All Rooms") {
-        basefilteredOfferings = basefilteredOfferings.filter(
-            (device) => device.room_code === activeFilters.room
-        );
-    }
-
-    if (
-        activeFilters.deviceType &&
-        activeFilters.deviceType !== "Device Type" &&
-        activeFilters.deviceType !== "All Device Types"
-    ) {
-        basefilteredOfferings = basefilteredOfferings.filter(
-            (device) =>
-                device.emergency_device_type_name === activeFilters.deviceType
-        );
-    }
-
-    if (
-        activeFilters.status &&
-        activeFilters.status !== "Status" &&
-        activeFilters.status !== "All Statuses"
-    ) {
-        basefilteredOfferings = basefilteredOfferings.filter(
-            (device) => device.status.String === activeFilters.status
-        );
-    }
-
-    // If search is empty, use just the filtered results
-    if (!searchValue) {
-        filteredOfferings = basefilteredOfferings;
-    } else {
-        // Apply search filter to the fresh filtered state
-        filteredOfferings = basefilteredOfferings.filter((device) => {
-            const baseSearch =
-                device.emergency_device_type_name
-                    .toLowerCase()
-                    .includes(searchValue) ||
-                device.extinguisher_type_name.String.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.room_code.toLowerCase().includes(searchValue) ||
-                device.serial_number.String.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.manufacture_date.Time.toLowerCase().includes(
-                    searchValue
-                ) ||
-                device.expire_date.Time.toLowerCase().includes(searchValue) ||
-                device.size.String.toLowerCase().includes(searchValue) ||
-                device.status.String.toLowerCase().includes(searchValue) ||
-                device.description.String.toLowerCase().includes(searchValue);
-
-            // Add admin-only fields if user is admin
-            if (role === "Admin") {
-                const lastInspectionFormatted = new Date(
-                    device.last_inspection_datetime.Time
-                )
-                    .toLocaleDateString("en-NZ", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                    })
-                    .toLowerCase();
-
-                const nextInspectionFormatted = new Date(
-                    device.next_inspection_date.Time
-                )
-                    .toLocaleDateString("en-NZ", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                    })
-                    .toLowerCase();
-
-                return (
-                    baseSearch ||
-                    lastInspectionFormatted.includes(searchValue) ||
-                    nextInspectionFormatted.includes(searchValue)
-                );
-            }
-
-            return baseSearch;
-        });
-    }
-
-    updateTable();
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -677,4 +526,5 @@ document.getElementById("rowsPerPage").addEventListener("change", (e) => {
 
 // Make functions available globally
 window.clearFilters = clearFilters;
-
+window.filteredTable = filteredTable;
+window.getAllExamOfferings = getAllExamOfferings;

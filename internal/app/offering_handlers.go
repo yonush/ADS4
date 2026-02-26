@@ -23,9 +23,11 @@ func (a *App) HandleGetAllOfferings(c echo.Context) error {
 		return c.Redirect(http.StatusSeeOther, "/dashboard?error=Method not allowed")
 	}
 	examID := c.QueryParam("examid")
+	year := c.QueryParam("year")
 	statusCode := c.QueryParam("status")
+	semester := c.QueryParam("semester")
 
-	examOfferings, err := a.DB.GetAllOfferings(examID, statusCode)
+	examOfferings, err := a.DB.GetAllOfferings(examID, year, semester, statusCode)
 	if err != nil {
 		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
 	}

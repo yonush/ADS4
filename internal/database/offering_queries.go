@@ -36,50 +36,7 @@ type Exam struct {
 	Description string `json:"Description"`
 }
 
-// used to hold a list of years for the offerings in the DB
-type Year struct {
-	Year string `json:"Year"`
-}
 
-// GetExamYears retrieves all exam offering years from the database. This is used by the admin interface filters
-func (db *DB) GetExamYears() ([]Year, error) {
-	var query string
-	var args []any
-
-	query = `SELECT distinct year FROM examMetrics;`
-
-	// Prepare and execute the query
-	rows, err := db.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	// Define the result slice
-	var years []Year
-
-	// Scan the results
-	for rows.Next() {
-		var year Year
-		err := rows.Scan(
-			&year.Year,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		years = append(years, year)
-	}
-
-	// Return empty slice if:
-	// 1. no offerings are found
-	if len(years) == 0 {
-		return []Year{}, nil
-	}
-
-	return years, nil
-}
 
 // GetAllOfferings retrieves all exam offerings from the database, with optional filtering by offering year. If no offerings are found, it returns an empty slice.
 // TODO: add provision for semesters or alternately disable courses after a certain date
@@ -136,7 +93,7 @@ func (db *DB) GetActiveExams(filteryear string) ([]Exam, error) {
 }
 
 // GetAllOfferings retrieves all exam offerings from the database, with optional filtering by exam ID or status code. If no offerings are found, it returns an empty slice.
-func (db *DB) GetAllOfferings(examID string, statusCode string) ([]models.Offerings, error) {
+func (db *DB) GetAllOfferings(examID, year, semester, statusCode string) ([]models.Offerings, error) {
 	var query string
 	//var args []interface{}
 	var args []any
@@ -154,16 +111,26 @@ func (db *DB) GetAllOfferings(examID string, statusCode string) ([]models.Offeri
 	query = `SELECT o.examid, o.coursecode, o.year, o.semester, o.password, o.status, o.coordinator, o.ownerid,o.duration
  		     FROM Offerings o
 	`
+	//prepare for possible filter
+	//if statusCode != "" || examID != "" || semester != "" || year != "" {
+	//	query += `WHERE `
+	//}
 
-	// Add filtering by examid OR statuscode not both
+	// Add filtering for one of four poossible fields NOT together
 	if statusCode != "" {
 		query += `WHERE o.status = $1`
 		args = append(args, statusCode)
 	} else if examID != "" {
 		query += `WHERE o.examid = $1`
 		args = append(args, examID)
-
+	} else if year != "" {
+		query += `WHERE o.year = $1`
+		args = append(args, examID)
+	} else if semester != "" {
+		query += `WHERE o.semester = $1`
+		args = append(args, examID)
 	}
+
 	// Prepare and execute the query
 	rows, err := db.Query(query, args...)
 	if err != nil {

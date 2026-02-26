@@ -1,20 +1,19 @@
 <!-- This is the exam offering list component of the dashboard page -->
+<script>
+    function autoRefreshExams() {
+        const auto = document.getElementById("autorefresh");
+        if (auto.checked) {
+            //window.location = window.location.href;
+            filteredTable()
+        }
+    }
+    setInterval('autoRefreshExams()', 5000);
+</script>
+
 <div class="container-fluid">
     <div class="row mx-lg-2">
         <!-- Exam offering List Section -->
         <div class="device-list col-xxl-12">
-            <div class="d-flex justify-content-end"></div>
-            <div>
-                <!-- Search and filter section -->
-                <div class="input-group mb-3">
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="searchInput"
-                        placeholder="Search for exams.."
-                    />
-                </div>
-            </div>
             <!-- Filter section -->
             <div
                 class="d-flex align-items-start justify-content-between mb-3 flex-wrap"
@@ -46,8 +45,7 @@
                             class="form-select"
                             style="padding-left: 2.5rem; width: 100%"
                         >
-                            <option selected>Current Year</option>
-                            <option>All Years</option>
+                            <option value="" selected>Current Year</option>
                             <!-- Dropdown options for the first dropdown -->
                         </select>
                     </div>
@@ -85,15 +83,21 @@
                         </select>
                     </div>
                 </div>
-
-                               <!-- Clear Filters Button -->
-                <button
-                    type="button"
-                    class="btn btn-secondary align-self-end mt-2 mt-xl-0 mx-2 ms-lg-0 ms-xl-2 me-lg-0"
-                    onclick="clearFilters()"
-                    style="min-height: 38px">
-                    Clear Filters
-                </button>
+                <div class="position-relative flex-grow-2 mt-2 mt-xl-0 mx-2 ms-lg-0">
+                    <div class="position-relative">
+                        <button
+                            type="button"
+                            class="btn btn-secondary align-self-end mt-2 mt-xl-0 mx-2 ms-lg-0 ms-xl-2 me-lg-0"
+                            onclick="clearFilters()"
+                            style="min-height: 38px">
+                            Clear Filters
+                        </button>
+                    </div>  
+                    <div class="position-relative">
+                        <label for="autorefresh" class="form-label">Auto refresh data</label>
+                        <input type="checkbox" id="autorefresh" name="autorefresh" value="yes">
+                    </div>    
+                </div>
             </div>
 
             <!-- Bootstrap Table -->

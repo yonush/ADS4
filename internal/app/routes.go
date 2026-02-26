@@ -58,13 +58,18 @@ func (a *App) initRoutes() {
 	a.Router.POST("/register", a.HandlePostRegister)
 	a.Router.GET("/forgot-password", a.HandleGetForgotPassword)
 	a.Router.POST("/forgot-password", a.HandlePostForgotPassword)
-	//other public routes
+
+	//public routes for the Assesment Tool
 	a.Router.GET("/hello", a.HandeGetHello)
 	a.Router.GET("/examlist", a.HandleGetExamList)
 	a.Router.GET("/auth/:examid/:studentid", a.HandleGetStudentAuth)
 	a.Router.GET("/exam/:examid/:password", a.HandleGetStudentExam)
 	a.Router.POST("/examupload/:studentid/:examid/:password", a.HandlePostExamUpload)
+
+	//public routes for the dashboard
 	a.Router.GET("/yearlist", a.HandleGetYearList) //list of available years for the offerings
+	a.Router.GET("/exammetrics", a.HandleExamMetrics)
+	a.Router.GET("/closedexams/:field/:value/:semester", a.HandleClosedExams) // /closedexams/:field/:value/:semester
 
 	//a.Router.GET("/shutdown", a.HandeGetShutdown) //admin only route to shutdown the server, for testing purposes
 
