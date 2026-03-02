@@ -12,6 +12,30 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type csvDateTime struct {
+	time.Time
+}
+
+func (date *csvDateTime) MarshalCSV() (string, error) {
+	return date.Time.Format("20060201"), nil
+}
+
+func (date *csvDateTime) String() string {
+	return date.String() // Redundant, just for example
+}
+
+func (date *csvDateTime) UnmarshalCSV(csv string) (err error) {
+	date.Time, err = time.Parse("20060201", csv)
+	return err
+}
+
+// Our example struct with a custom type (DateTime)
+type Client struct {
+	Id       string      `csv:"id"`
+	Name     string      `csv:"name"`
+	Employed csvDateTime `csv:"employed"`
+}
+
 // TemplateRenderer implements echo.Renderer
 type TemplateRenderer struct {
 	templates *template.Template

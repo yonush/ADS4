@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -50,16 +49,16 @@ func (a *App) ProcessImportFile(c echo.Context, target string) error {
 	if err != nil {
 		return err
 	}
-	var ErrNotFound = errors.New("handler not found")
+	var ErrNotFound = errors.New("import handler not found")
 
 	switch target {
-	case "learners":
+	case "learner":
 		err = a.DB.ImportLearners(datafile, purge, overwrite)
-	case "courses":
+	case "course":
 		err = a.DB.ImportCourses(datafile, purge, overwrite)
-	case "learnerexams":
+	case "learnerexam":
 		err = a.DB.ImportLearnerExams(datafile, purge, overwrite)
-	case "offerings":
+	case "offering":
 		err = a.DB.ImportOfferings(datafile, purge, overwrite)
 	default:
 		return ErrNotFound
@@ -72,110 +71,27 @@ func (a *App) ProcessImportFile(c echo.Context, target string) error {
 	return nil
 }
 
-func (a *App) HandlePostImportLearner(c echo.Context) error {
+func (a *App) HandlePostImport(c echo.Context) error {
 	// Check if request is a POST request
 	if c.Request().Method != http.MethodPost {
-		return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{
-			"error": "Method not allowed"})
+		return c.String(http.StatusSeeOther, "Invalid handler method")
+		//return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{"error": "Method not allowed"})
 	}
 
-	err := a.ProcessImportFile(c, "learners")
+	//check of the target file is correct
+	target := c.Param("target")
+	if target != "learner" && target != "course" && target != "offering" && target != "learnerexam" {
+		//return c.Redirect(http.StatusSeeOther, "/admin?error="+"Invalid import target.")
+		//return c.JSON(http.StatusSeeOther, map[string]string{"error": "Invalid import import target."})
+		return c.String(http.StatusSeeOther, "Invalid import target: "+target)
+	}
+
+	err := a.ProcessImportFile(c, target)
 	if err != nil {
-		return c.Redirect(http.StatusSeeOther, "/admin?error="+"Error processing import file: "+err.Error())
-	}
-
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-
-	return c.Render(http.StatusOK, "admin.html", map[string]interface{}{
-		"message":       "Learners successfully imported.",
-		"username":      claims["username"],
-		"role":          claims["role"],
-		"email":         claims["email"],
-		"user_id":       claims["user_id"],
-		"default_admin": claims["default_admin"],
-	})
-}
-
-func (a *App) HandlePostImportCourses(c echo.Context) error {
-
-	// Check if request is a POST request
-	if c.Request().Method != http.MethodPost {
-		return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{
-			"error": "Method not allowed"})
-
-	}
-
-	err := a.ProcessImportFile(c, "courses")
-	if err != nil {
-		return c.Render(http.StatusSeeOther, "admin.html", map[string]interface{}{
-			"error": "Error processing import file: " + err.Error()})
-
+		//return c.Render(http.StatusSeeOther, "admin.html", map[string]interface{}{"error": "Error processing import file: " + err.Error()})
 		//return c.Redirect(http.StatusSeeOther, "/admin?error=Error processing import file: "+err.Error())
 		//return c.JSON(http.StatusSeeOther, map[string]string{"error": "Error processing import file: " + err.Error()})
+		return c.String(http.StatusSeeOther, "Error processing import file: "+err.Error())
 	}
-
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-
-	return c.Render(http.StatusOK, "admin.html", map[string]interface{}{
-		"message":       "Courses successfully imported.",
-		"username":      claims["username"],
-		"role":          claims["role"],
-		"email":         claims["email"],
-		"user_id":       claims["user_id"],
-		"default_admin": claims["default_admin"],
-	})
-}
-
-func (a *App) HandlePostImportLearnerExams(c echo.Context) error {
-	// Check if request is a POST request
-	if c.Request().Method != http.MethodPost {
-		return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{
-			"error": "Method not allowed"})
-
-	}
-
-	err := a.ProcessImportFile(c, "learnerexams")
-	if err != nil {
-		return c.Redirect(http.StatusSeeOther, "/admin?error="+"Error processing import file: "+err.Error())
-	}
-
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-
-	return c.Render(http.StatusOK, "admin.html", map[string]interface{}{
-		"message":       "Learner exams successfully imported.",
-		"username":      claims["username"],
-		"role":          claims["role"],
-		"email":         claims["email"],
-		"user_id":       claims["user_id"],
-		"default_admin": claims["default_admin"],
-	})
-}
-
-func (a *App) HandlePostImportOfferings(c echo.Context) error {
-	// Check if request is a POST request
-	if c.Request().Method != http.MethodPost {
-		return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{
-			"error": "Method not allowed"})
-
-	}
-
-	err := a.ProcessImportFile(c, "offerings")
-	if err != nil {
-		return c.Redirect(http.StatusSeeOther, "/admin?error="+"Error processing import file: "+err.Error())
-	}
-
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-
-	return c.Render(http.StatusOK, "admin.html", map[string]interface{}{
-		"message":       "Exam offerings successfully imported.",
-		"username":      claims["username"],
-		"role":          claims["role"],
-		"email":         claims["email"],
-		"user_id":       claims["user_id"],
-		"default_admin": claims["default_admin"],
-	})
+	return c.String(http.StatusOK, "Successful import for : "+target)
 }

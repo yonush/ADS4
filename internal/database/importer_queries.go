@@ -4,6 +4,7 @@ import (
 	"ADS4/internal/models"
 	_ "database/sql"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gocarina/gocsv"
@@ -29,7 +30,8 @@ func (db *DB) ImportCourses(datafile string, purge, overwrite bool) error {
 	if err := gocsv.UnmarshalFile(src, &courses); err != nil {
 		return err
 	}
-	
+
+	//empty the table before inserting new records
 	if purge {
 		overwrite = false
 		_, err := db.Exec(`DELETE FROM courses;`)
@@ -41,16 +43,16 @@ func (db *DB) ImportCourses(datafile string, purge, overwrite bool) error {
 	var query string
 	if overwrite {
 		//perform updates
-		query = `INSERT INTO Courses (CourseCode, Description, Level, Status)
-			 	 VALUES ($1, $2, $3, $4)`
+		query = `UPDATE Courses SET Description=$2, Level=$3, Status=$4
+			 	 WHERE CourseCode=$1;`
 	} else {
 		query = `INSERT INTO Courses (CourseCode, Description, Level, Status)
-				 VALUES ($1, $2, $3, $4)`
+				 VALUES ($1, $2, $3, $4);`
 		//assume the data is correct then perform the inserts
 	}
 
 	for _, course := range courses {
-		_, err := db.Exec(query, course.CourseCode, course.Description, course.Level, course.Status)
+		_, err := db.Exec(query, strings.TrimSpace(course.CourseCode), course.Description, course.Level, course.Status)
 		if err != nil {
 			return err
 		}
@@ -61,7 +63,7 @@ func (db *DB) ImportCourses(datafile string, purge, overwrite bool) error {
 
 // Import order 1
 func (db *DB) ImportLearners(datafile string, purge, overwrite bool) error {
-	
+
 	src, err := os.Open(datafile)
 	if err != nil {
 		return err
@@ -74,7 +76,8 @@ func (db *DB) ImportLearners(datafile string, purge, overwrite bool) error {
 	if err := gocsv.UnmarshalFile(src, &learners); err != nil {
 		return err
 	}
-	
+
+	//empty the table before inserting new records
 	if purge {
 		overwrite = false
 		_, err := db.Exec(`DELETE FROM learners;`)
@@ -86,16 +89,16 @@ func (db *DB) ImportLearners(datafile string, purge, overwrite bool) error {
 	var query string
 	if overwrite {
 		//perform updates
-		query = `INSERT INTO Learners (StudentID, Name, Status)
-				VALUES ($1, $2, $3)`
+		query = `UPDATE Learners SET Name=$2, Status=$3
+				WHERE StudentID=$1;`
 	} else {
 		query = `INSERT INTO Learners (StudentID, Name, Status)
-				VALUES ($1, $2, $3)`
+				VALUES ($1, $2, $3);`
 		//assume the data is correct then perform the inserts
 	}
 
 	for _, learner := range learners {
-		_, err := db.Exec(query, learner.StudentID, learner.StudentName, learner.Status)
+		_, err := db.Exec(query, strings.TrimSpace(learner.StudentID), learner.StudentName, learner.Status)
 		if err != nil {
 			return err
 		}
@@ -106,23 +109,21 @@ func (db *DB) ImportLearners(datafile string, purge, overwrite bool) error {
 
 // Import order 2
 
-
 func (db *DB) ImportOfferings(datafile string, purge, overwrite bool) error {
-	
+
 	src, err := os.Open(datafile)
 	if err != nil {
 		return err
 	}
 	defer src.Close()
 
-
 	//read the CSV file in
-	//TODO include some data checks before attempting to load
 	var offerings []*models.OfferingsCSV
 	if err := gocsv.UnmarshalFile(src, &offerings); err != nil {
 		return err
 	}
 
+	//empty the table before inserting new records
 	if purge {
 		overwrite = false
 		_, err := db.Exec(`DELETE FROM offerings;`)
@@ -134,17 +135,26 @@ func (db *DB) ImportOfferings(datafile string, purge, overwrite bool) error {
 	var query string
 	if overwrite {
 		//perform updates
-		query = `INSERT INTO Offerings (ExamID, Year, Semester, CourseCode, Password, Status, Coordinator, OwnerID, Duration)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+		query = `UPDATE Offerings SET Year=$2, Semester=$3, CourseCode=$4, Password=$5, Status=$6, Duration=$7)
+				WHERE ExamiID=$1;`
 	} else {
-		query = `INSERT INTO Offerings (ExamID, Year, Semester, CourseCode, Password, Status, Coordinator, OwnerID, Duration)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+		query = `INSERT INTO Offerings (ExamID, Year, Semester, CourseCode, Password, Status, Duration)
+				VALUES ($1, $2, $3, $4, $5, $6, $7);`
 		//assume the data is correct then perform the inserts
 	}
 
+	//insert/update the offerings
 	for _, offering := range offerings {
-		_, err := db.Exec(query, offering.ExamID, offering.Year, offering.Semester, strings.TrimSpace(offering.CourseCode),
-			offering.Password, offering.Status, offering.Coordinator, offering.OwnerID, offering.Duration)
+		//create the examid [year:4][semester:2][coursecode:9]
+		examid := strconv.Itoa(offering.Year) + strings.TrimSpace(offering.Semester) + strings.TrimSpace(offering.CourseCode)
+		_, err := db.Exec(query,
+			examid,
+			offering.Year,
+			offering.Semester,
+			strings.TrimSpace(offering.CourseCode),
+			offering.Password,
+			offering.Status,
+			offering.Duration)
 		if err != nil {
 			return err
 		}
@@ -156,7 +166,7 @@ func (db *DB) ImportOfferings(datafile string, purge, overwrite bool) error {
 // Import order 3
 
 func (db *DB) ImportLearnerExams(datafile string, purge, overwrite bool) error {
-	
+
 	src, err := os.Open(datafile)
 	if err != nil {
 		return err
@@ -169,7 +179,8 @@ func (db *DB) ImportLearnerExams(datafile string, purge, overwrite bool) error {
 	if err := gocsv.UnmarshalFile(src, &learnerexams); err != nil {
 		return err
 	}
-	
+
+	//empty the table before inserting new records
 	if purge {
 		overwrite = false
 		_, err := db.Exec(`DELETE FROM learnerexams;`)
@@ -181,17 +192,19 @@ func (db *DB) ImportLearnerExams(datafile string, purge, overwrite bool) error {
 	var query string
 	if overwrite {
 		//perform updates
-		query = `INSERT INTO learnerexams (StudentID, ExamID, StartTime, EndTime,Status, Grade)
-				VALUES ($1, $2, $3, $4, $5, $6)`
+		query = `UPDATE learnerexams SET StudentID=$1, ExamID=$2, Status=$3)
+				 WHERE StudentID=$1 AND ExamID=$2;`
 	} else {
-		query = `INSERT INTO learnerexams (StudentID, ExamID, StartTime, EndTime,Status, Grade)
-				VALUES ($1, $2, $3, $4, $5, $6)`
+		query = `INSERT INTO learnerexams (StudentID, ExamID, Status)
+				VALUES ($1, $2, $3);`
 		//assume the data is correct then perform the inserts
 	}
 
 	for _, learnerexam := range learnerexams {
-		_, err := db.Exec(query, learnerexam.StudentID, learnerexam.ExamID, learnerexam.StartTime, learnerexam.EndTime,
-			learnerexam.Status, learnerexam.Grade)
+		_, err := db.Exec(query,
+			strings.TrimSpace(learnerexam.StudentID),
+			strings.TrimSpace(learnerexam.ExamID),
+			learnerexam.Status)
 		if err != nil {
 			return err
 		}

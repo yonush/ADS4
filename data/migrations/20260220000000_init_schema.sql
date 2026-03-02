@@ -25,8 +25,8 @@ CREATE TABLE "Offerings" (
     "CourseCode"  VARCHAR(9) NOT NULL,
     "Password"    VARCHAR(8) NOT NULL,
     "Status"      VARCHAR(6) NOT NULL DEFAULT 'active',
-    "Coordinator" INTEGER,
-    "OwnerID"     INTEGER,
+    "Coordinator" INTEGER DEFAULT 0,
+    "OwnerID"     INTEGER DEFAULT 0,
     "Duration"    INTEGER,
     PRIMARY KEY("ExamID"),
     UNIQUE("ExamID"),
@@ -55,17 +55,16 @@ CREATE UNIQUE INDEX learners_byStudentID ON learners(StudentID);
 -- Table to store each learner's exam attempt, with a unique LearnerExamID for each attempt, and a foreign key reference to the Offerings table using ExamID
 
 CREATE TABLE "Learnerexams" (
-    "LearnerExamID" INTEGER,
     "StudentID"     VARCHAR(8) NOT NULL,
     "ExamID"        VARCHAR(15) NOT NULL,
     "StartTime"     TIME,
     "EndTime"       TIME,
     "Status"        VARCHAR(6) NOT NULL DEFAULT 'ready',
-    "Grade"         INTEGER,
-    PRIMARY KEY("LearnerExamID" AUTOINCREMENT),
+    "Grade"         INTEGER DEFAULT 0,
+    PRIMARY KEY("StudentID","ExamID"),
     FOREIGN KEY("ExamID") REFERENCES "Offerings"("ExamID"),
-    CHECK (Status IN ('ready', 'active', 'expire', 'closed', 'marked')),
-    FOREIGN KEY("StudentID") REFERENCES "Learners"("StudentID")    
+    FOREIGN KEY("StudentID") REFERENCES "Learners"("StudentID"),    
+    CHECK (Status IN ('ready', 'active', 'expire', 'closed', 'marked'))
 );
 CREATE INDEX learnerexams_byCourseCode ON learnerexams(StudentID);
 CREATE INDEX learnerexams_byExamID ON learnerexams(ExamID);
@@ -124,6 +123,8 @@ WHERE o.ExamID = l.ExamID AND l.StudentID = s.StudentID
 -- Drop tables in reverse order of creation to avoid foreign key constraint violations
 DROP VIEW IF EXISTS "examMetrics";
 DROP VIEW IF EXISTS "ClosedExams";
+DROP VIEW IF EXISTS "MarkedExams";
+
 DROP TABLE IF EXISTS "Learnerexams";
 DROP TABLE IF EXISTS "Learners";
 DROP TABLE IF EXISTS "Offerings";

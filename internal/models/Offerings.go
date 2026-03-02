@@ -35,7 +35,7 @@ CREATE TABLE "Offerings" (
 */
 
 type Offerings struct {
-	ExamID      sql.NullString `json:"examid"` // [year:4][semester:2][coursecode:*]
+	ExamID      sql.NullString `json:"examid"` // [year:4][semester:2][coursecode:9]
 	CourseCode  sql.NullString `json:"coursecode"`
 	Year        int            `json:"year"`
 	Semester    sql.NullString `json:"semester"`
@@ -47,7 +47,7 @@ type Offerings struct {
 }
 
 type OfferingsDto struct {
-	ExamID      string `json:"examid"` //[year:4][semester:2][coursecode:*]
+	ExamID      string `json:"examid"` //[year:4][semester:2][coursecode:9]
 	CourseCode  string `json:"coursecode"`
 	Year        string `json:"year"`
 	Semester    string `json:"semester"`
@@ -61,13 +61,10 @@ type OfferingsDto struct {
 // structure for reading CSV files - used with the seeding function - database/seed.go
 //this will also be used with the data import feature
 type OfferingsCSV struct {
-	ExamID      string `csv:"ExamID"`
-	CourseCode  string `csv:"CourseCode"`
-	Year        int    `csv:"Year"`
-	Semester    string `csv:"Semester"`
-	Password    string `csv:"Password"`
-	Status      string `csv:"Status"`
-	Coordinator int    `csv:"Coordinator"`
-	OwnerID     int    `csv:"OwnerID"`
-	Duration    int    `csv:"Duration"`
+	CourseCode string `csv:"CourseCode"`
+	Year       int    `csv:"Year"`
+	Semester   string `csv:"Semester"`
+	Password   string `csv:"Password"`
+	Status     string `csv:"Status"`
+	Duration   int    `csv:"Duration"`
 }

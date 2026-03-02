@@ -135,25 +135,25 @@ func SeedData(db *DB) {
 	// purge and import new data
 	log.Println("Importing course & offerings data.")
 	log.Printf("- Reading %v/courses.csv", datadir)
-	err = db.ImportCourses(datadir+"/courses.csv", true, false)
+	err = db.ImportCourses(datadir+"/seed/courses.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("- Reading %v/learners.csv", datadir)
-	err = db.ImportLearners(datadir+"/learners.csv", true, false)
+	err = db.ImportLearners(datadir+"/seed/learners.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("- Reading %v/offerings.csv", datadir)
-	err = db.ImportOfferings(datadir+"/offerings.csv", true, false)
+	err = db.ImportOfferings(datadir+"/seed/offerings.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("- Reading %v/learnerexams.csv", datadir)
-	err = db.ImportLearnerExams(datadir+"/learnerexams.csv", true, false)
+	err = db.ImportLearnerExams(datadir+"/seed/learnerexams.csv", true, false)
 	if err != nil {
 		log.Fatal(err)
 	}

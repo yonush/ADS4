@@ -1,7 +1,0 @@
-main (start HTTP server)
-
-internal/app
-
-
-main->app->routes->router_handlers
-

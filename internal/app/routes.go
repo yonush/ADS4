@@ -94,11 +94,8 @@ func (a *App) initRoutes() {
 	admin.GET("/admin", a.HandleGetAdmin)
 	admin.GET("/shutdown", a.HandeGetShutdown) //admin only route to shutdown the server, for testing purposes
 	//admin.GET("/yearlist", a.HandleGetYearList) //list of available years for the offerings
-	//Bulk data importer routers
-	admin.POST("/importlearners", a.HandlePostImportLearner)
-	admin.POST("/importcourses", a.HandlePostImportCourses)
-	admin.POST("/importlearnerexams", a.HandlePostImportLearnerExams)
-	admin.POST("/importofferings", a.HandlePostImportOfferings)
+	//Bulk data importer router - /import/course, /import/learner, /import/offering, /import/learnerexam
+	admin.POST("/import/:target", a.HandlePostImport)
 
 	// User management CRUD routes
 	admin.POST("/api/user", a.HandlePostUser)

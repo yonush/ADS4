@@ -9,6 +9,7 @@ import (
 
 	"ADS4/internal/config"
 	"ADS4/internal/models"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/sethvargo/go-password/password"
@@ -157,7 +158,7 @@ func (a *App) HandlePostRegister(c echo.Context) error {
 	user := models.User{
 		Username: username,
 		Email:    email,
-		Role:    "",
+		Role:     "",
 		Password: string(hashedPassword),
 	}
 
@@ -321,7 +322,7 @@ func parseToken(tokenString string) (*jwt.Token, error) {
 }
 
 // sendPasswordResetEmail sends a password reset email
-//TODO update the from/sender email and attach to config. Fix SMTP credentials
+// TODO update the from/sender email and attach to config. Fix SMTP credentials
 func sendPasswordResetEmail(email, username, newPassword string) error {
 	m := gomail.NewMessage()
 	m.Reset()

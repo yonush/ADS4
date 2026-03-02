@@ -1,7 +1,5 @@
 <!-- This template is for the bulk data importer in the admin panel -->
 <script>
-    const progressBar = document.querySelector("progress");
-    progressBar.classList.remove("visible");
 
 </script>
 <div>
@@ -24,21 +22,27 @@
 
                 <input type="radio" id="offeringdata" name="route" value="offering">
                 <label for="offeringdata" class="form-label">Exam Offerings</label>     
-
+                <ul>
+                    <li>By default the import process inserts new records only.</li> 
+                    <li>Purge will empty the table first then import the data.</li>
+                    <li>Overwrite will update any existing records</li>
+                </ul>
+            </div>
+            <div class="mb-3">
+                <label for="purge" class="form-label">Purge existing data? (this setting overrides the Overwrite setting)</label>
+                <input type="checkbox" id="purge" name="purge" value="yes">
             </div>
             <div class="mb-3">
                 <label for="overwrite" class="form-label">Overwrite existing data?</label>
                 <input type="checkbox" id="overwrite" name="overwrite" value="yes">
             </div>
-            <div class="mb-3">
-                <label for="purge" class="form-label">Purge existing data?</label>
-                <input type="checkbox" id="purge" name="purge" value="yes">
-            </div>
+
             <hr />
             <div class="mb-3">                    
-                CSV data file: <input type="file" id="datafile" name="datafile" ><br><br>
-                <p><progress></progress></p>
-                <p><output></output></p>
+                CSV data file: <input type="file" id="datafile" name="datafile" ><br>
+                <div class="mb-3">  
+                    <output class="text-bg-info p-3"></output>
+                </div>   
                 <button type="button" class="btn btn-primary" onclick="btnImport()">Import Data</button>
                 <button class="btn btn-danger" disabled id="abort">Abort</button>
             
