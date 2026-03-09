@@ -8,6 +8,7 @@ type User struct {
 	Role          string `json:"role"` // Admin, Faculty, Learner
 	DefaultAdmin  bool   `json:"default_admin"`
 	CurrentUserID int    `json:"current_user_id"`
+	Active        bool   `json:"active"`
 }
 
 type UserDto struct {
@@ -19,4 +20,5 @@ type UserDto struct {
 	Password        string `json:"password"`
 	ConfirmPassword string `json:"confirm_password"`
 	DefaultAdmin    string `json:"default_admin"`
+	Active          string `json:"active"`
 }

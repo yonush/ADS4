@@ -7,7 +7,7 @@ import (
 
 // GetAllUsers function
 func (db *DB) GetAllUsers() ([]models.User, error) {
-	query := `SELECT userid, username, email, role, defaultadmin FROM userT`
+	query := `SELECT userid, username, email, role, defaultadmin, active FROM userT`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -24,6 +24,7 @@ func (db *DB) GetAllUsers() ([]models.User, error) {
 			&user.Email,
 			&user.Role,
 			&user.DefaultAdmin,
+			&user.Active,
 		)
 		if err != nil {
 			return nil, err
@@ -61,10 +62,10 @@ func (db *DB) CreateUser(user *models.User) error {
 func (db *DB) UpdateUserWithPassword(user *models.User) error {
 	query := `
         UPDATE userT
-        SET username = $1, email = $2, role = $3, password = $4
-        WHERE userid = $5
+        SET username = $1, email = $2, role = $3, password = $4, active = $5
+        WHERE userid = $6
         `
-	args := []interface{}{user.Username, user.Email, user.Role, user.Password, user.UserID}
+	args := []interface{}{user.Username, user.Email, user.Role, user.Password, user.Active, user.UserID}
 
 	updateStmt, err := db.Prepare(query)
 	if err != nil {
@@ -85,11 +86,11 @@ func (db *DB) UpdateUserWithPassword(user *models.User) error {
 func (db *DB) UpdateUser(user *models.User) error {
 	query := `
 		UPDATE userT
-		SET username = $1, email = $2, role = $3
-		WHERE userid = $4
+		SET username = $1, email = $2, role = $3, active = $4
+		WHERE userid = $5
 		`
 
-	args := []interface{}{user.Username, user.Email, user.Role, user.UserID}
+	args := []interface{}{user.Username, user.Email, user.Role, user.Active, user.UserID}
 
 	updateStmt, err := db.Prepare(query)
 
@@ -112,7 +113,7 @@ func (db *DB) UpdateUser(user *models.User) error {
 // Get user by username function
 func (db *DB) GetUserByUsername(username string) (*models.User, error) {
 	query := `
-		SELECT userid, username, password, email, role, defaultadmin
+		SELECT userid, username, password, email, role, defaultadmin, active
 		FROM userT
 		WHERE username = $1
 		`
@@ -124,6 +125,7 @@ func (db *DB) GetUserByUsername(username string) (*models.User, error) {
 		&user.Email,
 		&user.Role,
 		&user.DefaultAdmin,
+		&user.Active,
 	)
 
 	if err != nil {
@@ -136,19 +138,20 @@ func (db *DB) GetUserByUsername(username string) (*models.User, error) {
 // Get user by ID function
 func (db *DB) GetUserByID(userid int) (*models.User, error) {
 	query := `
-		SELECT userid, username, password, email, role, defaultadmin
+		SELECT userid, username, password, email, role, defaultadmin, active
 		FROM userT
 		WHERE userid = $1
 		`
 
 	var user models.User
-	err := db.QueryRow(query, userid).Scan(
+	err := db.QueryRow(query).Scan(
 		&user.UserID,
 		&user.Username,
 		&user.Password,
 		&user.Email,
 		&user.Role,
 		&user.DefaultAdmin,
+		&user.Active,
 	)
 
 	if err != nil {
@@ -200,10 +203,33 @@ func (db *DB) UpdatePassword(userid int, password string) error {
 	return nil
 }
 
+// Update password function
+func (db *DB) UpdateActive(userid int, active bool) error {
+	query := `
+		UPDATE userT
+		SET active = $1
+		WHERE userid = $2
+		`
+	updateStmt, err := db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer updateStmt.Close()
+
+	_, err = updateStmt.Exec(active, userid)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Get user by email function
 func (db *DB) GetUserByEmail(email string) (*models.User, error) {
 	query := `
-		SELECT userid, username, password, email, role
+		SELECT userid, username, password, email, role,active
 		FROM userT
 		WHERE email = $1
 		`
@@ -214,6 +240,7 @@ func (db *DB) GetUserByEmail(email string) (*models.User, error) {
 		&user.Password,
 		&user.Email,
 		&user.Role,
+		&user.Active,
 	)
 
 	if err != nil {
@@ -221,4 +248,23 @@ func (db *DB) GetUserByEmail(email string) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+// check if the suer is active
+func (db *DB) IsUserActive(userid int) bool {
+	query := `
+		SELECT active
+		FROM userT
+		WHERE userid = $1 AND active = 1
+		`
+	var user models.User
+	err := db.QueryRow(query, userid).Scan(
+		&user.Active,
+	)
+
+	if err != nil {
+		return false
+	}
+
+	return true
 }

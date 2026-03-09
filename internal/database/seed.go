@@ -119,15 +119,15 @@ func SeedData(db *DB) {
 	log.Println("Seeding data...")
 	// Insert Users - user names must be at least 6 characters
 	_, err = db.Exec(`
-		INSERT INTO UserT (username, password, role, email, defaultadmin)
-		VALUES ('adminx', $1, 'Admin', 'admin@email.com', 1)`, adminHash)
+		INSERT INTO UserT (username, password, role, email, defaultadmin, active)
+		VALUES ('adminx', $1, 'Admin', 'admin@email.com', 1, 1)`, adminHash)
 	if err != nil {
-		log.Printf("- adminx user exists, skipping admin user creation")
+		log.Printf("- adminx user exists, skipping admin user creation: %s", err.Error())
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO UserT (username, password, role, email, defaultadmin)
-		VALUES ('bobbyx', $1, 'Faculty', 'bobbyx@email.com',0)`, userHash)
+		INSERT INTO UserT (username, password, role, email, defaultadmin, active)
+		VALUES ('bobbyx', $1, 'Faculty', 'bobbyx@email.com', 0, 1)`, userHash)
 	if err != nil {
 		log.Printf("- bobbyx user exists, skipping faculty user creation")
 	}

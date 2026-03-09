@@ -99,7 +99,7 @@ func (a *App) HandlePutUser(c echo.Context) error {
 	}
 
 	// Validate role
-	if user.Role != "Lecturer" && user.Role != "Learner" && user.Role != "Admin" {
+	if user.Role != "Faculty" && user.Role != "Learner" && user.Role != "Admin" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error":       "Invalid role",
 			"redirectURL": "/admin?error=Invalid role",
@@ -149,6 +149,19 @@ func (a *App) HandlePutUser(c echo.Context) error {
 		})
 	}
 
+	// Try activate the role
+	active := false
+	if user.Active == "true" {
+		active = true
+	}
+
+	//cannot deactivate or change the admin role
+	if userIDInt == 1 {
+		user.Active = "true"
+		user.Username = "adminx"
+		user.Role = "Admin"
+	}
+
 	// Check if the user is trying to edit their own account
 	if user.CurrentUserID == userID {
 		// Check if the user is trying to change their role
@@ -159,7 +172,7 @@ func (a *App) HandlePutUser(c echo.Context) error {
 			})
 		}
 
-		// parse tthe password
+		// parse the password
 		password := user.Password
 		confirmedPassword := user.ConfirmPassword
 
@@ -178,6 +191,7 @@ func (a *App) HandlePutUser(c echo.Context) error {
 				Username: user.Username,
 				Email:    user.Email,
 				Role:     user.Role,
+				Active:   active,
 			}
 
 			// Update the user in the database
@@ -282,6 +296,7 @@ func (a *App) HandlePutUser(c echo.Context) error {
 			Username: user.Username,
 			Email:    user.Email,
 			Role:     user.Role,
+			Active:   active,
 		}
 
 		// Update the user in the database
@@ -375,10 +390,21 @@ func (a *App) HandlePostUser(c echo.Context) error {
 		})
 	}
 
+	// Try activate the role
+	/*
+		act, err := strconv.ParseBool(user.Active)
+		if user.Active != "true" && user.Active != "false" {
+			return c.JSON(http.StatusOK, map[string]string{
+				"error":       "Unable to activate/deactivate the role",
+				"redirectURL": "/admin?error=Unable to activate/deactivate the role",
+			})
+		}*/
+
 	User := &models.User{
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,
+		Active:   false,
 	}
 
 	// Update the user in the database

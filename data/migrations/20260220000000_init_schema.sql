@@ -78,6 +78,7 @@ CREATE TABLE "UserT" (
     "Email"     VARCHAR(255) UNIQUE NOT NULL,
     "Role"      VARCHAR(20) NOT NULL DEFAULT 'Learner',
     "DefaultAdmin"    BOOLEAN NOT NULL DEFAULT FALSE,
+    "Active"    BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY("UserID" AUTOINCREMENT),
     CHECK (Role IN ('Admin','Faculty','Learner'))
 );

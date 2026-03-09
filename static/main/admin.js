@@ -26,13 +26,14 @@ fetch("/api/user")
 
             // Determine whether to hide action buttons based on conditions
             const hideActions = !current_default_admin && isAdmin;
-
+            var isActive = JSON.parse(user.active)?"Active":"Inactive"
             // Generate the row HTML
             return `
 <tr${user.user_id === currentUserIdNumber ? ' class="table-primary"' : ""}>
     <td data-label="Username">${user.username}</td>
     <td data-label="Email">${user.email}</td>
     <td data-label="Role">${user.role}</td>
+    <td data-label="Active">${isActive}</td>
     <td>
     <div class="btn-group">
     ${
@@ -80,19 +81,21 @@ fetch("/api/user")
 
 export async function editUser(userId) {
     const id = userId;
-    console.log("Edit user ID:", id);
+    //console.log("Edit user ID:", id);
     // Handle edit
     // Fetch the user data from the nearest row
     const row = $(event.target).closest("tr");
     const username = row.find("td[data-label=Username]").text();
     const email = row.find("td[data-label=Email]").text();
     const role = row.find("td[data-label=Role]").text();
+    const active = row.find("td[data-label=Active]").text();
 
     const default_admin = await fetch(`/api/user/${username}`)
         .then((response) => response.json())
         .then((user) => {
             return user.default_admin.toString();
         });
+
 
     // Fill in the form with the user data
     $("#editUserForm")[0].reset();
@@ -102,6 +105,9 @@ export async function editUser(userId) {
     $("#editUserForm input[name=email]").val(email);
     $("#editUserForm select[name=role]").val(role);
     $("#editUserForm input[name=default_admin]").val(default_admin);
+    var isActive = active=="Active"?true:false
+    document.getElementById("updActive").checked = isActive
+    //$("#editUserForm input[name=active]").val(isActive);
 
     // Set the form action to the update endpoint for this user
     $("#editUserForm").attr("action", `/api/user/${id}`);
@@ -136,6 +142,7 @@ export async function editUser(userId) {
             for (const [key, value] of formData.entries()) {
                 jsonData[key] = value;
             }
+            //alert(JSON.stringify(jsonData))
             fetch(`/api/user/${document.getElementById("editUserID").value}`, {
                 method: "PUT",
                 headers: {

@@ -76,6 +76,14 @@
                             <option value="Learner">Learner</option>
                         </select>
                     </div>
+            {{if eq .role "Admin"}}
+                    <div class="mb-3">
+
+                        <label for="active" class="form-label">User active? </label>
+                        <input type="checkbox" id="updActive" name="active" value="true">
+                    </div>
+            {{end}}                    
+
                     <div class="mb-3" id="passwordField" style="display: none">
                         <label for="password" class="form-label"
                             >New Password:</label
@@ -117,7 +125,7 @@
                     Close
                 </button>
                 <button type="button" id="editUserBtn" class="btn btn-primary">
-                    Edit User
+                    Update
                 </button>
             </div>
         </div>

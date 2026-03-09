@@ -44,6 +44,12 @@ func (a *App) HandlePostForgotPassword(c echo.Context) error {
 		return c.Redirect(http.StatusSeeOther, "/forgot-password?error=Email%20not%20found")
 	}
 
+	// Check if the user account is active
+	active := a.DB.IsUserActive(user.UserID)
+	if active != true {
+		return c.Redirect(http.StatusSeeOther, "/forgot-password?error=Inactive%20user%20account")
+	}
+
 	// Generate a new password
 	newPassword, err := password.Generate(10, 8, 2, false, false)
 	if err != nil {
@@ -141,7 +147,7 @@ func (a *App) HandlePostRegister(c echo.Context) error {
 		})
 	}
 
-	// Check if the user or email already exists
+	// Check if the user or email already exists and are active
 	if _, err := a.DB.GetUserByUsername(username); err == nil {
 		return c.Render(http.StatusOK, "register.html", map[string]interface{}{
 			"error": "Username already exists",
@@ -209,7 +215,7 @@ func (a *App) HandleGetLogin(c echo.Context) error {
 
 // HandlePostLogin handles user login
 func (a *App) HandlePostLogin(c echo.Context) error {
-	// Check if request if a GET request
+	// Check if request if a POST request
 	if c.Request().Method != http.MethodPost {
 		return c.Render(http.StatusMethodNotAllowed, "index.html", map[string]interface{}{
 			"error": "Method not allowed",
@@ -225,6 +231,13 @@ func (a *App) HandlePostLogin(c echo.Context) error {
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 			"error": "Invalid username or password",
+		})
+	}
+	// Check if the user account is active
+	active := a.DB.IsUserActive(user.UserID)
+	if active != true {
+		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
+			"error": "Inactive user account",
 		})
 	}
 
