@@ -318,8 +318,9 @@ loadOfferingsAndUpdateTable(activeFilters.year,activeFilters.semester);
 function formatOfferingRow(offering) {
     if (!offering) return "";
 
-    const buttons = getActionButtons(offering);
-
+    //disable CRUD controls
+    //const buttons = getActionButtons();
+    const buttons = "";
     // Declare isAdmin within the function
     let isAdmin = false;
 
@@ -355,7 +356,7 @@ function formatOfferingRow(offering) {
     `;
 }
 
-export function getActionButtons(offering) {
+export function getActionButtons() {
     let buttons = `
         <button class="btn btn-primary p-2" 
                 onclick="" 

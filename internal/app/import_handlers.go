@@ -15,11 +15,13 @@ func (a *App) TransferFile(c echo.Context, destfile string) error {
 	//retrieve the uploaded data file - this assumes the form variable datafile
 	inf, err := c.FormFile("datafile")
 	if err != nil {
+		a.handleLogger("Error accessing import file data: " + err.Error())
 		return err
 	}
 
 	src, err := inf.Open()
 	if err != nil {
+		a.handleLogger("Error opening srouce import file: " + err.Error())
 		return err
 	}
 	defer src.Close()
@@ -27,11 +29,13 @@ func (a *App) TransferFile(c echo.Context, destfile string) error {
 	//copy and save the exam file
 	dst, err := os.Create(destfile)
 	if err != nil {
+		a.handleLogger("Error creating tagert import file: " + err.Error())
 		return err
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
+		a.handleLogger("Error copying source import file to target location: " + err.Error())
 		return err
 	}
 
@@ -47,6 +51,7 @@ func (a *App) ProcessImportFile(c echo.Context, target string) error {
 	datafile := a.DataDir + "/" + target + ".csv"
 	err := a.TransferFile(c, datafile)
 	if err != nil {
+		a.handleLogger("Transfer error with file import: " + err.Error())
 		return err
 	}
 	var ErrNotFound = errors.New("import handler not found")
@@ -65,6 +70,7 @@ func (a *App) ProcessImportFile(c echo.Context, target string) error {
 	}
 
 	if err != nil {
+		a.handleLogger("Error importing data into database: " + err.Error())
 		return err
 	}
 

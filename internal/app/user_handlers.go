@@ -66,13 +66,7 @@ func (a *App) HandlePutUser(c echo.Context) error {
 		})
 	}
 
-	// log the user model
-	a.handleLogger(user.CurrentUserID)
-	a.handleLogger(user.DefaultAdmin)
-	a.handleLogger(user.Role)
-
 	user.UserID = userID
-
 	// Validate input
 	if user.Username == "" || user.Email == "" || user.Role == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{

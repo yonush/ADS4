@@ -52,7 +52,6 @@ func (a *App) HandleGetOfferingByID(c echo.Context) error {
 
 	// Fetch the exam from the database
 	offering, err := a.DB.GetOfferingByID(examID)
-
 	if err != nil {
 		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
 	}

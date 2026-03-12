@@ -82,11 +82,6 @@ func (a *App) HandlePostLearnerExam(c echo.Context) error {
 	examid := c.FormValue("examid")
 	status := c.FormValue("status")
 
-	a.handleLogger("Learner ID: " + learnerexamID)
-	a.handleLogger("Student ID: " + studentid)
-	a.handleLogger("Exam ID: " + examid)
-	a.handleLogger("Status: " + status)
-
 	// Validate input
 	learnerexam, err := validateLearnerExam(learnerexamID, studentid, examid, status)
 	if err != nil {
@@ -132,12 +127,6 @@ func (a *App) HandlePutLearnerExam(c echo.Context) error {
 			"redirectURL": "/dashboard?error=Invalid learner exam details request body",
 		})
 	}
-
-	// Log the incoming data
-	a.handleLogger("Learner ID: " + learnerexam.LearnerExamID)
-	a.handleLogger("Student ID: " + learnerexam.StudentID)
-	a.handleLogger("Exam ID: " + learnerexam.ExamID)
-	a.handleLogger("Status: " + learnerexam.Status)
 
 	// Validate input
 	learnerExam, err := validateLearnerExam(learnerexam.LearnerExamID, learnerexam.StudentID, learnerexam.ExamID, learnerexam.Status)
@@ -242,6 +231,7 @@ func (a *App) HandleDeleteLearnerExam(c echo.Context) error {
 	// Delete the LearnerExam from the database
 	err = a.DB.DeleteLearnerExam(learnerexamID)
 	if err != nil {
+		a.handleLogger("Error deleting learner exam details: " + err.Error())
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error":       "Error deleting learner exam",
 			"redirectURL": "/dashboard?error=Error deleting learner exam " + err.Error(),
@@ -312,10 +302,6 @@ func (a *App) HandlePutLearnerExamStatus(c echo.Context) error {
 			"error":       "Status code is invalid - must be one of available, active, expired, closed, marked",
 			"redirectURL": "/dashboard?error=Status code is invalid - must be one of available, active, expired, closed, marked"})
 	}
-
-	// Log the incoming data
-	a.handleLogger("Learner exam ID: " + learnerexamid)
-	a.handleLogger("Status: " + req.Status)
 
 	// Update the LearnerExam status in the database
 	err = a.DB.UpdateLearnerExamStatus(learnerexamID, req.Status)

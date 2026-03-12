@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -31,7 +30,7 @@ func (a *App) AdminOnly(next echo.HandlerFunc) echo.HandlerFunc {
 func (a *App) HandeGetShutdown(c echo.Context) error {
 	a.DB.Close()
 	// Log the shutdown process
-	log.Println("Shutting HTTP service down")
+	a.handleLogger("Shutting HTTP service down")
 	os.Exit(0)
 	return nil
 }

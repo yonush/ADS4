@@ -25,6 +25,7 @@ func (a *App) HandleGetYearList(c echo.Context) error {
 	//retrieve the list of years in the database
 	examyears, err := a.DB.GetExamYears()
 	if err != nil {
+		a.handleLogger("Error fetching exam year data: " + err.Error())
 		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
 	}
 
@@ -59,6 +60,7 @@ func (a *App) HandleExamMetrics(c echo.Context) error {
 	//retrieve the list of active exam offerings with current metrics
 	metrics, err := a.DB.GetExamByYearSemester(year, semester)
 	if err != nil {
+		a.handleLogger("Error fetching exam data: " + err.Error())
 		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
 	}
 
@@ -100,6 +102,7 @@ func (a *App) HandleClosedExams(c echo.Context) error {
 	//fmt.Printf("%s, %s, %s\n", field, value, semester)
 	metrics, err := a.DB.GetExaminations(field, value, semester)
 	if err != nil {
+		a.handleLogger("Error fetchign examination data: ")
 		return a.handleError(c, http.StatusInternalServerError, "Error fetching data", err)
 	}
 

@@ -83,11 +83,6 @@ func (a *App) HandlePostCourse(c echo.Context) error {
 	description := c.FormValue("description")
 	status := c.FormValue("status")
 
-	a.handleLogger("Course code: " + coursecode)
-	a.handleLogger("Description: " + description)
-	a.handleLogger("Level: " + level)
-	a.handleLogger("Status: " + status)
-
 	// Validate input
 	Course, err := validateCourse(coursecode, description, level, status)
 	if err != nil {
@@ -132,11 +127,6 @@ func (a *App) HandlePutCourse(c echo.Context) error {
 			"redirectURL": "/dashboard?error=Invalid exam Course request body",
 		})
 	}
-
-	a.handleLogger("Course code: " + coursedto.CourseCode)
-	a.handleLogger("Description: " + coursedto.Description)
-	a.handleLogger("Level: " + coursedto.Level)
-	a.handleLogger("Status: " + coursedto.Status)
 
 	// Validate input
 	course, err := validateCourse(coursedto.CourseCode, coursedto.Description, coursedto.Level, coursedto.Status)
@@ -310,10 +300,6 @@ func (a *App) HandlePutCourseStatus(c echo.Context) error {
 			"error":       "Status is required",
 			"redirectURL": "/dashboard?error=Status is required"})
 	}
-
-	// Log the incoming data
-	a.handleLogger("Exam ID: " + coursecode)
-	a.handleLogger("Status: " + req.Status)
 
 	// Update the exam status in the database
 	err = a.DB.UpdateCourseStatus(coursecode, req.Status)

@@ -23,21 +23,27 @@ type App struct {
 	DataDir string
 }
 
+const (
+	colorBlue  = "\033[1;38;2;62;93;185m"
+	colorRed   = "\033[1;38;2;213;70;70m"
+	colorBlack = "\033[0m"
+)
+
 // null route handler for testing
 func (a *App) handleNULL(c echo.Context) error {
-	a.Logger.Printf("\033[34mNull handler called\033[0m")
+	a.Logger.Printf("Null handler called")
 	return c.Render(http.StatusOK, "index.html", nil)
 }
 
 // handleError is a method of App for handling errors
 func (a *App) handleError(c echo.Context, statusCode int, message string, err error) error {
-	a.Logger.Printf("\033[31mError: %v\033[0m", err) // Use the logger in the App struct
+	a.Logger.Printf(colorRed+"Error: %v"+colorBlack, err) // Use the logger in the App struct
 	return c.JSON(statusCode, map[string]string{"error": message})
 }
 
 func (a *App) handleLogger(message string) {
 
-	a.Logger.Printf("\033[34m%s\033[0m", message)
+	a.Logger.Printf(colorBlue+"%s"+colorBlack, message)
 }
 
 // NewApp creates a new instance of App
@@ -77,7 +83,7 @@ func NewApp(cfg config.Config) *App {
 	}
 
 	// Initialize Logger
-	logger := log.New(os.Stdout, "\033[34mAPP: \033[0m", log.LstdFlags)
+	logger := log.New(os.Stdout, colorBlue+"APP:"+colorBlack, log.LstdFlags)
 
 	app := &App{
 		DB:      db,
