@@ -4,7 +4,11 @@
   - https://github.com/labstack/echo/blob/master/API_CHANGES_V5.md
 - Use templ and go fs for embedding the templates 
 - Include CORS and CSRF protections - needs domain name
-  
+- need to refine the data import mechanism
+  - check if it is the correct file - contains header with correct fields and field count
+  - verify column names and count before parsing to JSON  
+  - include an import exception log for records inserted, updated
+
 - https://www.sqlite.org/pragma.html#pragma_synchronous
 - https://github.com/mattn/go-sqlite3?tab=readme-ov-file
 - https://go-sponge.com/
@@ -19,10 +23,6 @@
             var is_current_user_default_admin = "{{.default_admin}}";
         </script>
 
-- Update importers to include:
-  - check if it is the correct file - contains header with correct fields and field count
-  - check field types and structure
-  - [option]generate exception report 
 - use for datetime handling https://www.digitalocean.com/community/tutorials/how-to-use-dates-and-times-in-go
 - [option] Timestamp the actual questions in the assessment tool
   
